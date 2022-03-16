@@ -32,7 +32,7 @@ dependencies {
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
 
 //    modImplementation 'curse.maven:optifabric-322385:3568115'
-    modImplementation 'com.github.Chocohead:OptiFabric:215640d9ad'
+//    modImplementation 'com.github.Chocohead:OptiFabric:215640d9ad'
 
     implementation("blue.endless:jankson:1.2.1")
     shadowCommon("blue.endless:jankson:1.2.1")

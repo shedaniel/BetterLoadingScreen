@@ -3,7 +3,6 @@ package me.shedaniel.betterloadingscreen.forge;
 import cpw.mods.modlauncher.ArgumentHandler;
 import cpw.mods.modlauncher.Launcher;
 import cpw.mods.modlauncher.api.LamdbaExceptionUtils;
-import me.shedaniel.betterloadingscreen.launch.EarlyWindow;
 import me.shedaniel.betterloadingscreen.launch.early.BackgroundRenderer;
 import net.minecraftforge.fml.loading.FMLLoader;
 import org.jetbrains.annotations.Nullable;
@@ -15,17 +14,17 @@ import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
 public class BetterLoadingScreenForgeVisualization {
-    public static void start(@Nullable String mcVersion, BackgroundRenderer renderer) {
+    public static String[] extractRunArgs() {
         try {
             Field field = Launcher.class.getDeclaredField("argumentHandler");
             field.setAccessible(true);
             Object argumentHandler = field.get(Launcher.INSTANCE);
             field = ArgumentHandler.class.getDeclaredField("args");
             field.setAccessible(true);
-            String[] args = (String[]) field.get(argumentHandler);
-            EarlyWindow.start(args, mcVersion, renderer);
+            return (String[]) field.get(argumentHandler);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            return new String[0];
         }
     }
     

@@ -10,6 +10,7 @@ import me.shedaniel.betterloadingscreen.BetterLoadingScreenConfig;
 import me.shedaniel.betterloadingscreen.EarlyGraphics;
 import me.shedaniel.betterloadingscreen.api.render.EarlyWindowHook;
 import me.shedaniel.betterloadingscreen.launch.early.BackgroundRenderer;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
@@ -20,6 +21,8 @@ import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
@@ -38,7 +41,7 @@ public class EarlyWindow {
     public static int framebufferWidth, framebufferHeight;
     private static int x, y;
     public static int scale;
-    private static boolean fullscreen;
+    public static boolean fullscreen;
     public static boolean running = true;
     public static Lock lock = new ReentrantLock();
     public static boolean hasRender = true;
@@ -47,10 +50,10 @@ public class EarlyWindow {
     private static final Queue<Runnable> tasks = new ConcurrentLinkedDeque<>();
     public static Executor executor = tasks::add;
     
-    private static void initDimensions(String[] args) {
+    private static void initDimensions(@Nullable Boolean fullscreen, String[] args) {
         EarlyWindow.width = 854;
         EarlyWindow.height = 480;
-        EarlyWindow.fullscreen = false;
+        EarlyWindow.fullscreen = BooleanUtils.isTrue(fullscreen);
         try {
             int i = 0;
             for (String s : args) {
@@ -71,7 +74,7 @@ public class EarlyWindow {
                 } else if ("--height".equals(s)) {
                     i = 2;
                 } else if ("--fullscreen".equals(s)) {
-                    fullscreen = true;
+                    EarlyWindow.fullscreen = true;
                 }
             }
         } catch (Throwable throwable) {
@@ -79,7 +82,25 @@ public class EarlyWindow {
         }
     }
     
-    public static void start(String[] args, @Nullable String mcVersion, BackgroundRenderer renderer) {
+    public static Boolean getDefaultFullscreen(Path gameDir) {
+        Path path = gameDir.resolve("options.txt");
+        
+        if (Files.exists(path)) {
+            try {
+                for (String line : Files.readAllLines(path)) {
+                    if (line.trim().startsWith("fullscreen:")) {
+                        return Boolean.parseBoolean(line.substring(line.indexOf(':') + 1).trim());
+                    }
+                }
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+        
+        return null;
+    }
+    
+    public static void start(String[] args, @Nullable Boolean defaultFullscreen, @Nullable String mcVersion, BackgroundRenderer renderer) {
         List<String> list = Lists.newArrayList();
         GLFWErrorCallback errorCallback = GLFW.glfwSetErrorCallback((i, l) -> {
             list.add(String.format("GLFW error during init: [0x%X]%s", i, l));
@@ -106,7 +127,12 @@ public class EarlyWindow {
         GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 0);
         GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_ANY_PROFILE);
         GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GLFW.GLFW_FALSE);
-        initDimensions(args);
+        initDimensions(defaultFullscreen, args);
+        if (fullscreen) {
+            GLFWVidMode vidMode = GLFW.glfwGetVideoMode(monitor);
+            width = vidMode.width();
+            height = vidMode.height();
+        }
         window = GLFW.glfwCreateWindow(width, height, "Minecraft* " + mcVersion, fullscreen ? monitor : 0L, 0L);
         if (window == 0L) {
             throw new IllegalStateException("Failed to create the GLFW window");

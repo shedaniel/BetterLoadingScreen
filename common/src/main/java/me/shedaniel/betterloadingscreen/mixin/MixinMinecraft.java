@@ -34,6 +34,7 @@ public class MixinMinecraft implements MinecraftStub {
                 EarlyWindow.height = window.height;
                 EarlyWindow.framebufferWidth = window.framebufferWidth;
                 EarlyWindow.framebufferHeight = window.framebufferHeight;
+                EarlyWindow.fullscreen = window.fullscreen;
                 EarlyWindow.scale = EarlyWindow.calculateScale(false);
                 EarlyWindow.setRender(true, true);
             } finally {
@@ -71,6 +72,7 @@ public class MixinMinecraft implements MinecraftStub {
                 window.windowedHeight = window.height = EarlyWindow.height;
                 window.framebufferWidth = EarlyWindow.framebufferWidth;
                 window.framebufferHeight = EarlyWindow.framebufferHeight;
+                window.fullscreen = EarlyWindow.fullscreen;
             } finally {
                 EarlyWindow.lock.unlock();
             }

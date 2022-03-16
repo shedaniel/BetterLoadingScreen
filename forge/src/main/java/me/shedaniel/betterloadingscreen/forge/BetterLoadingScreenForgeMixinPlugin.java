@@ -4,6 +4,7 @@ import me.shedaniel.betterloadingscreen.BetterLoadingScreen;
 import me.shedaniel.betterloadingscreen.BetterLoadingScreenClient;
 import me.shedaniel.betterloadingscreen.EarlyGraphics;
 import me.shedaniel.betterloadingscreen.launch.BetterLoadingScreenPreInit;
+import me.shedaniel.betterloadingscreen.launch.EarlyWindow;
 import me.shedaniel.betterloadingscreen.launch.early.BackgroundRenderer;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -98,7 +99,7 @@ public class BetterLoadingScreenForgeMixinPlugin implements IMixinConfigPlugin {
         BetterLoadingScreenClient.renderer = renderer;
         
         if (BetterLoadingScreen.isEarlyLoadingEnabled()) {
-            BetterLoadingScreenForgeVisualization.start(FMLLoader.versionInfo().mcVersion(), renderer);
+            EarlyWindow.start(BetterLoadingScreenForgeVisualization.extractRunArgs(), EarlyWindow.getDefaultFullscreen(FMLPaths.GAMEDIR.get()), FMLLoader.versionInfo().mcVersion(), renderer);
         }
         // StartupMessageManager
         Set<String> messages = new HashSet<>();

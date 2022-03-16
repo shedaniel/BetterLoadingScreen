@@ -21,3 +21,5 @@ accessible field com/mojang/blaze3d/platform/Window framebufferWidth I
 mutable field com/mojang/blaze3d/platform/Window framebufferWidth I
 accessible field com/mojang/blaze3d/platform/Window framebufferHeight I
 mutable field com/mojang/blaze3d/platform/Window framebufferHeight I
+accessible field com/mojang/blaze3d/platform/Window fullscreen Z
+mutable field com/mojang/blaze3d/platform/Window fullscreen Z

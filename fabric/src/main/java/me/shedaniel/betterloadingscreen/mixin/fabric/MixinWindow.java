@@ -76,6 +76,7 @@ public abstract class MixinWindow {
             this.windowedHeight = this.height = EarlyWindow.height;
             this.framebufferWidth = EarlyWindow.framebufferWidth;
             this.framebufferHeight = EarlyWindow.framebufferHeight;
+            this.fullscreen = EarlyWindow.fullscreen;
             return;
         }
         
