@@ -1,0 +1,23 @@
+accessWidener   v2  named
+accessible class net/minecraft/client/renderer/texture/Stitcher$Holder
+accessible field net/minecraft/client/renderer/texture/Stitcher texturesToBeStitched Ljava/util/Set;
+accessible field com/mojang/blaze3d/platform/Window windowedX I
+mutable field com/mojang/blaze3d/platform/Window windowedX I
+accessible field com/mojang/blaze3d/platform/Window windowedY I
+mutable field com/mojang/blaze3d/platform/Window windowedY I
+accessible field com/mojang/blaze3d/platform/Window windowedWidth I
+mutable field com/mojang/blaze3d/platform/Window windowedWidth I
+accessible field com/mojang/blaze3d/platform/Window windowedHeight I
+mutable field com/mojang/blaze3d/platform/Window windowedHeight I
+accessible field com/mojang/blaze3d/platform/Window x I
+mutable field com/mojang/blaze3d/platform/Window x I
+accessible field com/mojang/blaze3d/platform/Window y I
+mutable field com/mojang/blaze3d/platform/Window y I
+accessible field com/mojang/blaze3d/platform/Window width I
+mutable field com/mojang/blaze3d/platform/Window width I
+accessible field com/mojang/blaze3d/platform/Window height I
+mutable field com/mojang/blaze3d/platform/Window height I
+accessible field com/mojang/blaze3d/platform/Window framebufferWidth I
+mutable field com/mojang/blaze3d/platform/Window framebufferWidth I
+accessible field com/mojang/blaze3d/platform/Window framebufferHeight I
+mutable field com/mojang/blaze3d/platform/Window framebufferHeight I

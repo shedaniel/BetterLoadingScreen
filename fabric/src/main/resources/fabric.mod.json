@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "better_loading_screen",
+  "version": "${version}",
+  "name": "Better Loading Screen",
+  "description": "A mod to improve the loading screen.",
+  "authors": [
+    "shedaniel"
+  ],
+  "icon": "icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "me.shedaniel.betterloadingscreen.fabric.BetterLoadingScreenFabric"
+    ],
+    "preLaunch": [
+      "me.shedaniel.betterloadingscreen.fabric.BetterLoadingScreenFabricPreInit"
+    ]
+  },
+  "mixins": [
+    "better_loading_screen.mixins.json",
+    "better_loading_screen-common.mixins.json"
+  ],
+  "depends": {
+    "minecraft": ">=1.18.1"
+  }
+}
