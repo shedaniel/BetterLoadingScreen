@@ -62,8 +62,8 @@ public abstract class MixinLoadingOverlay {
     
     @Inject(method = "<clinit>", at = @At("RETURN"))
     private static void staticInit(CallbackInfo ci) {
-        BRAND_BACKGROUND_NO_ALPHA = BetterLoadingScreenConfig.getColor(BetterLoadingScreen.CONFIG.backgroundColor, 0x2E3440) & ~0xFF000000;
-        BRAND_BACKGROUND = BetterLoadingScreenConfig.getColor(BetterLoadingScreen.CONFIG.backgroundColor, 0x2E3440) | 0xFF000000;
+        BRAND_BACKGROUND_NO_ALPHA = BetterLoadingScreenClient.renderer.getBackgroundColor() & ~0xFF000000;
+        BRAND_BACKGROUND = BetterLoadingScreenClient.renderer.getBackgroundColor() | 0xFF000000;
     }
     
     @Redirect(method = "render", at = @At(
