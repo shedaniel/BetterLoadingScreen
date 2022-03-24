@@ -1,11 +1,11 @@
 package me.shedaniel.betterloadingscreen.fabric;
 
 import me.shedaniel.betterloadingscreen.BetterLoadingScreen;
-import net.fabricmc.api.ModInitializer;
+import net.fabricmc.api.ClientModInitializer;
 
-public class BetterLoadingScreenFabric implements ModInitializer {
+public class BetterLoadingScreenFabric implements ClientModInitializer {
     @Override
-    public void onInitialize() {
+    public void onInitializeClient() {
         BetterLoadingScreen.init();
     }
 }

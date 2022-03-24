@@ -6,6 +6,9 @@ import me.shedaniel.betterloadingscreen.EarlyGraphics;
 import me.shedaniel.betterloadingscreen.launch.BetterLoadingScreenPreInit;
 import me.shedaniel.betterloadingscreen.launch.EarlyWindow;
 import me.shedaniel.betterloadingscreen.launch.early.BackgroundRenderer;
+import net.minecraft.util.FastColor;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.loading.LoadingModList;
@@ -32,6 +35,11 @@ public class BetterLoadingScreenForgeMixinPlugin implements IMixinConfigPlugin {
     public static final Logger LOGGER = LogManager.getLogger(BetterLoadingScreenForgeMixinPlugin.class);
     
     static {
+        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> Client::run);
+    }
+    
+    public static class Client {
+        public static void run() {
         BetterLoadingScreenPreInit.init(false);
         EarlyGraphics.resolver = url -> {
             return Objects.requireNonNull(EarlyGraphics.class.getClassLoader().getResourceAsStream(url), "Resource not found: " + url);
@@ -119,6 +127,7 @@ public class BetterLoadingScreenForgeMixinPlugin implements IMixinConfigPlugin {
         });
         thread.setDaemon(true);
         thread.start();
+        }
     }
     
     @Override

@@ -10,7 +10,7 @@
   "icon": "icon.png",
   "environment": "*",
   "entrypoints": {
-    "main": [
+    "client": [
       "me.shedaniel.betterloadingscreen.fabric.BetterLoadingScreenFabric"
     ],
     "preLaunch": [
