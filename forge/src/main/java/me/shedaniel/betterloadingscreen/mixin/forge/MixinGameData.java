@@ -43,7 +43,7 @@ public class MixinGameData {
         }
     }
     
-    @Inject(method = "freezeData", remap = false, at = @At(
+    @Inject(method = "freezeData", at = @At(
             value = "INVOKE",
             target = "Lnet/minecraftforge/registries/GameData;loadRegistry(Lnet/minecraft/resources/ResourceLocation;Lnet/minecraftforge/registries/RegistryManager;Lnet/minecraftforge/registries/RegistryManager;Ljava/lang/Class;Z)V"
     ), locals = LocalCapture.CAPTURE_FAILHARD)
@@ -53,7 +53,7 @@ public class MixinGameData {
         syncTask.setCurrentStepInfo(entry.getValue().getRegistryName().toString());
     }
     
-    @Inject(method = "freezeData", remap = false, at = @At(
+    @Inject(method = "freezeData", at = @At(
             value = "INVOKE",
             target = "Lnet/minecraftforge/registries/GameData;loadRegistry(Lnet/minecraft/resources/ResourceLocation;Lnet/minecraftforge/registries/RegistryManager;Lnet/minecraftforge/registries/RegistryManager;Ljava/lang/Class;Z)V",
             shift = At.Shift.AFTER
@@ -64,7 +64,7 @@ public class MixinGameData {
         syncTask.incrementStep();
     }
     
-    @Inject(method = {"lambda$freezeData$4", "lambda$freezeData$5", "lambda$freezeData$8", "lambda$freezeData$9"}, remap = false, at = @At(
+    @Inject(method = {"lambda$freezeData$4", "lambda$freezeData$5", "lambda$freezeData$8", "lambda$freezeData$9"}, at = @At(
             value = "HEAD"
     ))
     private static void freezeData(ResourceLocation id, ForgeRegistry registry, CallbackInfo ci) {
@@ -73,7 +73,7 @@ public class MixinGameData {
         freezeTask.setCurrentStepInfo(registry.getRegistryName().toString());
     }
     
-    @Inject(method = {"lambda$freezeData$4", "lambda$freezeData$5", "lambda$freezeData$8", "lambda$freezeData$9"}, remap = false, at = @At(
+    @Inject(method = {"lambda$freezeData$4", "lambda$freezeData$5", "lambda$freezeData$8", "lambda$freezeData$9"}, at = @At(
             value = "RETURN"
     ))
     private static void freezeDataPost(ResourceLocation id, ForgeRegistry registry, CallbackInfo ci) {

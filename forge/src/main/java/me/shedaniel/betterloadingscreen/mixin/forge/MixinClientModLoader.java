@@ -7,11 +7,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.ClientPackSource;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
-import net.minecraftforge.client.loading.ClientModLoader;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.fml.ModLoadingStage;
+import net.minecraftforge.fml.client.ClientModLoader;
 import net.minecraftforge.forgespi.language.IModInfo;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -36,7 +36,7 @@ public class MixinClientModLoader {
             field.set(ModLoader.get(), Optional.<Consumer<String>>of((s) -> {
                 if (consumer.isPresent()) {
                     consumer.get().accept(s);
-                    if ("Dispatching gathering events".equals(s)) {
+                    if (ModList.get() != null && String.format("Constructing %d mods", ModList.get().getMods().size()).equals(s)) {
                         try {
                             int[] count = {0};
                             SteppedTask modsForge = LoadGameSteps.initModsForge();

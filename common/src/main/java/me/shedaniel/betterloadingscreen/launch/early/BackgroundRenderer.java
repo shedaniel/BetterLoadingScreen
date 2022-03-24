@@ -5,7 +5,6 @@ import me.shedaniel.betterloadingscreen.BetterLoadingScreenConfig;
 import me.shedaniel.betterloadingscreen.EarlyGraphics;
 import me.shedaniel.betterloadingscreen.api.render.ARGB32;
 import me.shedaniel.betterloadingscreen.api.render.AbstractGraphics;
-import net.minecraft.util.StringUtil;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 
@@ -18,23 +17,6 @@ import java.util.Properties;
 public interface BackgroundRenderer {
     @Nullable
     static BackgroundRenderer useKubeJs(Path gameDir) {
-        class _I {
-            static int getColor(Properties properties, String key, int def) {
-                String property = properties.getProperty(key);
-                
-                if (StringUtil.isNullOrEmpty(property) || property.equals("default")) {
-                    return def;
-                }
-                
-                try {
-                    return Integer.decode(property.startsWith("#") ? property : ("#" + property));
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    return def;
-                }
-            }
-        }
-        
         try {
             Path path = gameDir.resolve("kubejs/config/client.properties");
             if (Files.exists(path)) {
@@ -116,7 +98,7 @@ public interface BackgroundRenderer {
             
             @Override
             public void render(AbstractGraphics graphics) {
-                if (background.isEmpty()) {
+                if (!background.isPresent()) {
                     String name = path.toString();
                     if (graphics.bindTextureCustom(name, () -> path)) {
                         background = Optional.of(name);
@@ -196,9 +178,10 @@ public interface BackgroundRenderer {
     
     static void renderLogo(int color, Object name) {
         EarlyGraphics graphics = EarlyGraphics.INSTANCE;
-        if (name instanceof String str) {
-            EarlyGraphics._bindTexture(str);
-        } else if (name instanceof Path path) {
+        if (name instanceof String) {
+            EarlyGraphics._bindTexture((String) name);
+        } else if (name instanceof Path) {
+            Path path = (Path) name;
             if (!graphics.bindTextureCustom(path.toString(), () -> path)) {
                 throw new RuntimeException("Failed to bind texture: " + path);
             }

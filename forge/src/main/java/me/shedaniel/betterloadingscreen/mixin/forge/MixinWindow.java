@@ -60,9 +60,9 @@ public abstract class MixinWindow {
     
     @Redirect(method = "defaultErrorCallback", at = @At(
             value = "INVOKE",
-            target = "Lcom/mojang/blaze3d/systems/RenderSystem;assertOnRenderThread()V"
+            target = "Lcom/mojang/blaze3d/systems/RenderSystem;assertThread(Ljava/util/function/Supplier;)V"
     ))
-    private void defaultErrorCallback() {
+    private void defaultErrorCallback(Supplier supplier) {
         new RuntimeException().printStackTrace();
     }
     

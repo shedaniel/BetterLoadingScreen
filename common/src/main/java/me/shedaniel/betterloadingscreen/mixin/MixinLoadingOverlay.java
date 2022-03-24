@@ -1,7 +1,6 @@
 package me.shedaniel.betterloadingscreen.mixin;
 
 import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.betterloadingscreen.BetterLoadingScreen;
 import me.shedaniel.betterloadingscreen.BetterLoadingScreenClient;
@@ -15,16 +14,13 @@ import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
+import org.apache.commons.io.IOUtils;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -34,6 +30,8 @@ import java.nio.file.Files;
 @Mixin(LoadingOverlay.class)
 public abstract class MixinLoadingOverlay {
     @Shadow private long fadeOutStart;
+    @Shadow @Final @Mutable private static int BRAND_BACKGROUND;
+    @Shadow @Final @Mutable private static int BRAND_BACKGROUND_NO_ALPHA;
     
     @Shadow
     public abstract void render(PoseStack poseStack, int i, int j, float f);
@@ -62,10 +60,10 @@ public abstract class MixinLoadingOverlay {
         return y - 20;
     }
     
-    @Inject(method = {"method_35733", "lambda$static$0", "m_169327_"}, at = @At(value = "HEAD"), cancellable = true)
-    private static void getBrandColor(CallbackInfoReturnable<Integer> cir) {
-        int bgColor = BetterLoadingScreenConfig.getColor(BetterLoadingScreen.CONFIG.backgroundColor, 0x2E3440) | 0xFF000000;
-        cir.setReturnValue(bgColor);
+    @Inject(method = "<clinit>", at = @At("RETURN"))
+    private static void staticInit(CallbackInfo ci) {
+        BRAND_BACKGROUND_NO_ALPHA = BetterLoadingScreenConfig.getColor(BetterLoadingScreen.CONFIG.backgroundColor, 0x2E3440) & ~0xFF000000;
+        BRAND_BACKGROUND = BetterLoadingScreenConfig.getColor(BetterLoadingScreen.CONFIG.backgroundColor, 0x2E3440) | 0xFF000000;
     }
     
     @Redirect(method = "render", at = @At(
@@ -93,13 +91,13 @@ public abstract class MixinLoadingOverlay {
             
             if (Files.exists(BetterLoadingScreen.BACKGROUND_PATH)) {
                 TextureManager manager = Minecraft.getInstance().getTextureManager();
-                AbstractTexture texture = manager.getTexture(BACKGROUND_PATH, null);
+                AbstractTexture texture = manager.getTexture(BACKGROUND_PATH);
                 
                 if (texture == null) {
                     byte[] bytes;
                     
                     try (InputStream inputStream = Files.newInputStream(BetterLoadingScreen.BACKGROUND_PATH)) {
-                        bytes = inputStream.readAllBytes();
+                        bytes = IOUtils.toByteArray(inputStream);
                         texture = new DynamicTexture(NativeImage.read(new ByteArrayInputStream(bytes)));
                         manager.register(BACKGROUND_PATH, texture);
                         hasCustomBackground = true;
@@ -113,7 +111,7 @@ public abstract class MixinLoadingOverlay {
         }
         
         if (hasCustomBackground) {
-            RenderSystem.setShaderTexture(0, BACKGROUND_PATH);
+            Minecraft.getInstance().getTextureManager().bind(BACKGROUND_PATH);
             MinecraftGraphics.INSTANCE.innerBlit(0, minecraft.getWindow().getGuiScaledWidth(), 0, minecraft.getWindow().getGuiScaledHeight(),
                     0, 0, 1, 0, 1, 0xFFFFFFFF);
         }

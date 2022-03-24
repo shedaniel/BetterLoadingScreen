@@ -1,15 +1,18 @@
 package me.shedaniel.betterloadingscreen.forge;
 
+import com.google.common.base.MoreObjects;
 import me.shedaniel.betterloadingscreen.BetterLoadingScreen;
 import me.shedaniel.betterloadingscreen.BetterLoadingScreenClient;
 import me.shedaniel.betterloadingscreen.EarlyGraphics;
 import me.shedaniel.betterloadingscreen.launch.BetterLoadingScreenPreInit;
 import me.shedaniel.betterloadingscreen.launch.EarlyWindow;
 import me.shedaniel.betterloadingscreen.launch.early.BackgroundRenderer;
+import net.minecraft.util.FastColor;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.loading.LoadingModList;
 import net.minecraftforge.fml.loading.moddiscovery.ModFileInfo;
+import net.minecraftforge.fml.loading.progress.EarlyProgressVisualization;
 import net.minecraftforge.fml.loading.progress.StartupMessageManager;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
@@ -19,11 +22,12 @@ import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 import static me.shedaniel.betterloadingscreen.BetterLoadingScreenCommonMixinPlugin.hasOptifine;
@@ -34,7 +38,9 @@ public class BetterLoadingScreenForgeMixinPlugin implements IMixinConfigPlugin {
     static {
         BetterLoadingScreenPreInit.init(false);
         EarlyGraphics.resolver = url -> {
-            return Objects.requireNonNull(EarlyGraphics.class.getClassLoader().getResourceAsStream(url), "Resource not found: " + url);
+            InputStream stream = FastColor.class.getResourceAsStream(url);
+            if (stream != null) return stream;
+            throw new NullPointerException("Resource not found: " + url + " in " + FastColor.class.getClassLoader());
         };
         BetterLoadingScreenClient.inDev = !FMLLoader.isProduction();
         
@@ -42,7 +48,7 @@ public class BetterLoadingScreenForgeMixinPlugin implements IMixinConfigPlugin {
         
         if (BetterLoadingScreen.CONFIG.detectKubeJS && LoadingModList.get().getModFileById("kubejs") != null) {
             LOGGER.info("[BetterLoadingScreen] Detected KubeJS, inheriting KubeJS options!");
-            renderer = Objects.requireNonNullElse(BackgroundRenderer.useKubeJs(FMLPaths.GAMEDIR.get()), renderer);
+            renderer = MoreObjects.firstNonNull(BackgroundRenderer.useKubeJs(FMLPaths.GAMEDIR.get()), renderer);
         }
         
         if (BetterLoadingScreen.CONFIG.detectAllTheTweaks && LoadingModList.get().getModFileById("allthetweaks") != null) {
@@ -99,7 +105,32 @@ public class BetterLoadingScreenForgeMixinPlugin implements IMixinConfigPlugin {
         BetterLoadingScreenClient.renderer = renderer;
         
         if (BetterLoadingScreen.isEarlyLoadingEnabled()) {
-            EarlyWindow.start(BetterLoadingScreenForgeVisualization.extractRunArgs(), EarlyWindow.getDefaultFullscreen(FMLPaths.GAMEDIR.get()), FMLLoader.versionInfo().mcVersion(), renderer);
+            try {
+                Long window = null;
+                Field field = FMLLoader.class.getDeclaredField("mcVersion");
+                field.setAccessible(true);
+                String mcVersion = (String) field.get(null);
+                
+                field = EarlyProgressVisualization.class.getDeclaredField("visualization");
+                field.setAccessible(true);
+                Object visualization = field.get(EarlyProgressVisualization.INSTANCE);
+                if (visualization != null && visualization.getClass().getName().endsWith(".ClientVisualization")) {
+                    field = visualization.getClass().getDeclaredField("running");
+                    field.setAccessible(true);
+                    field.set(visualization, false);
+                    field = visualization.getClass().getDeclaredField("renderThread");
+                    field.setAccessible(true);
+                    Thread renderThread = (Thread) field.get(visualization);
+                    renderThread.join();
+                    field = visualization.getClass().getDeclaredField("window");
+                    field.setAccessible(true);
+                    window = (Long) field.get(visualization);
+                }
+                
+                EarlyWindow.start(BetterLoadingScreenForgeVisualization.extractRunArgs(), EarlyWindow.getDefaultFullscreen(FMLPaths.GAMEDIR.get()), window, mcVersion, renderer);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         // StartupMessageManager
         Set<String> messages = new HashSet<>();

@@ -11,6 +11,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Coerce;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
+import java.util.function.Supplier;
+
 @Mixin(Window.class)
 public abstract class MixinWindowOptifine {
     @Shadow
@@ -76,9 +78,9 @@ public abstract class MixinWindowOptifine {
     
     @Redirect(method = "defaultErrorCallback", at = @At(
             value = "INVOKE",
-            target = "Lcom/mojang/blaze3d/systems/RenderSystem;assertOnRenderThread()V"
+            target = "Lcom/mojang/blaze3d/systems/RenderSystem;assertThread(Ljava/util/function/Supplier;)V"
     ))
-    private void defaultErrorCallback() {
+    private void defaultErrorCallback(Supplier supplier) {
         new RuntimeException().printStackTrace();
     }
     

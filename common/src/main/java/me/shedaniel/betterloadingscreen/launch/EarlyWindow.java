@@ -100,7 +100,7 @@ public class EarlyWindow {
         return null;
     }
     
-    public static void start(String[] args, @Nullable Boolean defaultFullscreen, @Nullable String mcVersion, BackgroundRenderer renderer) {
+    public static void start(String[] args, @Nullable Boolean defaultFullscreen, @Nullable Long windowHandle, @Nullable String mcVersion, BackgroundRenderer renderer) {
         List<String> list = Lists.newArrayList();
         GLFWErrorCallback errorCallback = GLFW.glfwSetErrorCallback((i, l) -> {
             list.add(String.format("GLFW error during init: [0x%X]%s", i, l));
@@ -119,7 +119,6 @@ public class EarlyWindow {
         
         GLFWErrorCallback.createPrint(System.err).set();
         
-        long monitor = GLFW.glfwGetPrimaryMonitor();
         GLFW.glfwDefaultWindowHints();
         GLFW.glfwWindowHint(GLFW.GLFW_CLIENT_API, GLFW.GLFW_OPENGL_API);
         GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_CREATION_API, GLFW.GLFW_NATIVE_CONTEXT_API);
@@ -127,37 +126,58 @@ public class EarlyWindow {
         GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 0);
         GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_ANY_PROFILE);
         GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GLFW.GLFW_FALSE);
-        initDimensions(defaultFullscreen, args);
-        if (fullscreen) {
-            GLFWVidMode vidMode = GLFW.glfwGetVideoMode(monitor);
-            width = vidMode.width();
-            height = vidMode.height();
-        }
-        window = GLFW.glfwCreateWindow(width, height, "Minecraft* " + mcVersion, fullscreen ? monitor : 0L, 0L);
-        if (window == 0L) {
-            throw new IllegalStateException("Failed to create the GLFW window");
-        }
-        if (!fullscreen) {
-            if (monitor == 0L) {
-                int[] ax = new int[1];
-                int[] ay = new int[1];
-                GLFW.glfwGetWindowPos(window, ax, ay);
-                x = ax[0];
-                y = ay[0];
-            } else {
-                int[] monitorXA = new int[1];
-                int[] monitorYA = new int[1];
-                GLFW.glfwGetMonitorPos(monitor, monitorXA, monitorYA);
-                GLFWVidMode videomode = GLFW.glfwGetVideoMode(monitor);
-                int monitorX = monitorXA[0];
-                int monitorY = monitorYA[0];
-                x = monitorX + videomode.width() / 2 - width / 2;
-                y = monitorY + videomode.height() / 2 - height / 2;
+        if (windowHandle == null) {
+            long monitor = GLFW.glfwGetPrimaryMonitor();
+            initDimensions(defaultFullscreen, args);
+            if (fullscreen) {
+                GLFWVidMode vidMode = GLFW.glfwGetVideoMode(monitor);
+                width = vidMode.width();
+                height = vidMode.height();
             }
+            window = GLFW.glfwCreateWindow(width, height, "Minecraft* " + mcVersion, fullscreen ? monitor : 0L, 0L);
+            if (window == 0L) {
+                throw new IllegalStateException("Failed to create the GLFW window");
+            }
+            if (!fullscreen) {
+                if (monitor == 0L) {
+                    int[] ax = new int[1];
+                    int[] ay = new int[1];
+                    GLFW.glfwGetWindowPos(window, ax, ay);
+                    x = ax[0];
+                    y = ay[0];
+                } else {
+                    int[] monitorXA = new int[1];
+                    int[] monitorYA = new int[1];
+                    GLFW.glfwGetMonitorPos(monitor, monitorXA, monitorYA);
+                    GLFWVidMode videomode = GLFW.glfwGetVideoMode(monitor);
+                    int monitorX = monitorXA[0];
+                    int monitorY = monitorYA[0];
+                    x = monitorX + videomode.width() / 2 - width / 2;
+                    y = monitorY + videomode.height() / 2 - height / 2;
+                }
+            }
+            GLFW.glfwMakeContextCurrent(window);
+            setMode(monitor);
+        } else {
+            window = windowHandle;
+            GLFW.glfwMakeContextCurrent(window);
+            int[] ax = new int[1];
+            int[] ay = new int[1];
+            GLFW.glfwGetWindowPos(window, ax, ay);
+            x = ax[0];
+            y = ay[0];
+            int[] awidth = new int[1];
+            int[] aheight = new int[1];
+            GLFW.glfwGetWindowSize(window, awidth, aheight);
+            width = awidth[0];
+            height = aheight[0];
+            long monitor = GLFW.glfwGetWindowMonitor(window);
+            fullscreen = monitor != 0L;
+            GLFW.glfwGetFramebufferSize(window, awidth, aheight);
+            framebufferWidth = awidth[0];
+            framebufferHeight = aheight[0];
         }
         
-        GLFW.glfwMakeContextCurrent(window);
-        setMode(monitor);
         refreshFramebufferSize();
         scale = calculateScale(false);
         GLFW.glfwSwapInterval(0);

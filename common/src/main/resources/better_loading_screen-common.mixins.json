@@ -2,7 +2,7 @@
   "required": true,
   "package": "me.shedaniel.betterloadingscreen.mixin",
   "plugin": "me.shedaniel.betterloadingscreen.BetterLoadingScreenCommonMixinPlugin",
-  "compatibilityLevel": "JAVA_16",
+  "compatibilityLevel": "JAVA_8",
   "client": [
     "MixinFont",
     "MixinLoadingOverlay",

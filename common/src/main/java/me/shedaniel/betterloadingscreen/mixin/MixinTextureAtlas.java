@@ -20,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Stream;
 
 @Mixin(TextureAtlas.class)
@@ -63,19 +64,19 @@ public class MixinTextureAtlas {
         prepareToStitch(set);
     }
     
-    @Inject(method = {"method_18160", "lambda$getBasicSpriteInfos$2", "m_174717_", "lambda$makeSprites$2"}, at = @At(
+    @Inject(method = {"method_18160", "lambda$getBasicSpriteInfos$2", "func_224738_a", "lambda$makeSprites$2"}, at = @At(
             value = "HEAD"
     ))
-    private void extractTextureStart(ResourceLocation resourceLocation, ResourceManager resourceManager, Queue queue, CallbackInfo ci) {
+    private void extractTextureStart(ResourceLocation resourceLocation, ResourceManager resourceManager, ConcurrentLinkedQueue concurrentLinkedQueue, CallbackInfo ci) {
         if (activeTask != null) {
             activeTask.setCurrentStepInfo(resourceLocation.toString());
         }
     }
     
-    @Inject(method = {"method_18160", "lambda$getBasicSpriteInfos$2", "m_174717_", "lambda$makeSprites$2"}, at = @At(
+    @Inject(method = {"method_18160", "lambda$getBasicSpriteInfos$2", "func_224738_a", "lambda$makeSprites$2"}, at = @At(
             value = "RETURN"
     ))
-    private void extractTextureEnd(ResourceLocation resourceLocation, ResourceManager resourceManager, Queue queue, CallbackInfo ci) {
+    private void extractTextureEnd(ResourceLocation resourceLocation, ResourceManager resourceManager, ConcurrentLinkedQueue concurrentLinkedQueue, CallbackInfo ci) {
         if (activeTask != null) {
             activeTask.incrementStep();
         }

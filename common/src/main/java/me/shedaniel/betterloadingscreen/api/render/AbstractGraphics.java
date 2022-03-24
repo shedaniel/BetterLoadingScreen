@@ -1,5 +1,7 @@
 package me.shedaniel.betterloadingscreen.api.render;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +19,7 @@ public interface AbstractGraphics {
             byte[] bytes;
             
             try (InputStream inputStream = Files.newInputStream(supplier.get())) {
-                bytes = inputStream.readAllBytes();
+                bytes = IOUtils.toByteArray(inputStream);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

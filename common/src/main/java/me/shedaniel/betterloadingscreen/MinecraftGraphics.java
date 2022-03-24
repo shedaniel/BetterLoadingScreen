@@ -6,25 +6,26 @@ import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
-import dev.architectury.injectables.annotations.ExpectPlatform;
 import me.shedaniel.betterloadingscreen.api.render.AbstractGraphics;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.font.FontSet;
 import net.minecraft.client.gui.font.providers.GlyphProviderBuilderType;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.VanillaPackResources;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.SimpleReloadableResourceManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.opengl.GL11;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
+import java.util.Collections;
 import java.util.function.Supplier;
 
 public enum MinecraftGraphics implements AbstractGraphics {
@@ -47,9 +48,8 @@ public enum MinecraftGraphics implements AbstractGraphics {
             ResourceManager manager = createResourceManager(minecraft.getClientPackSource().getVanillaPack());
             TextureManager textureManager = minecraft.getTextureManager();
             FontSet fontSet = new FontSet(textureManager, new ResourceLocation("default"));
-            JsonElement element = JsonParser.parseString("""
-                    {"type":"bitmap","file":"minecraft:font/ascii.png","ascent":7,"chars":["\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000","\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000"," !\\"#$%&'()*+,-./","0123456789:;<=>?","@ABCDEFGHIJKLMNO","PQRSTUVWXYZ[\\\\]^_","`abcdefghijklmno","pqrstuvwxyz{|}~\\u0000","\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000","\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000£\\u0000\\u0000ƒ","\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000ªº\\u0000\\u0000¬\\u0000\\u0000\\u0000«»","░▒▓│┤╡╢╖╕╣║╗╝╜╛┐","└┴┬├─┼╞╟╚╔╩╦╠═╬╧","╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀","\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000∅∈\\u0000","≡±≥≤⌠⌡÷≈°∙\\u0000√\\u207f²■\\u0000"]}""");
-            fontSet.reload(List.of(
+            JsonElement element = new JsonParser().parse("{\"type\":\"bitmap\",\"file\":\"minecraft:font/ascii.png\",\"ascent\":7,\"chars\":[\"\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\",\"\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\",\" !\\\"#$%&'()*+,-./\",\"0123456789:;<=>?\",\"@ABCDEFGHIJKLMNO\",\"PQRSTUVWXYZ[\\\\]^_\",\"`abcdefghijklmno\",\"pqrstuvwxyz{|}~\\u0000\",\"\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\",\"\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000£\\u0000\\u0000ƒ\",\"\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000ªº\\u0000\\u0000¬\\u0000\\u0000\\u0000«»\",\"░▒▓│┤╡╢╖╕╣║╗╝╜╛┐\",\"└┴┬├─┼╞╟╚╔╩╦╠═╬╧\",\"╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀\",\"\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000∅∈\\u0000\",\"≡±≥≤⌠⌡÷≈°∙\\u0000√\\u207f²■\\u0000\"]}");
+            fontSet.reload(Collections.singletonList(
                     GlyphProviderBuilderType.BITMAP.create(element.getAsJsonObject()).create(manager)
             ));
             font = new Font(resourceLocation -> {
@@ -57,8 +57,8 @@ public enum MinecraftGraphics implements AbstractGraphics {
             });
             closable = () -> {
                 fontSet.close();
-                if (manager instanceof Closeable closeable) {
-                    closeable.close();
+                if (manager instanceof Closeable) {
+                    ((Closeable) manager).close();
                 }
             };
         }
@@ -66,9 +66,10 @@ public enum MinecraftGraphics implements AbstractGraphics {
         return font;
     }
     
-    @ExpectPlatform
     private static ResourceManager createResourceManager(VanillaPackResources pack) {
-        throw new AssertionError();
+        SimpleReloadableResourceManager manager = new SimpleReloadableResourceManager(PackType.CLIENT_RESOURCES);
+        manager.add(pack);
+        return manager;
     }
     
     @Override
@@ -94,8 +95,7 @@ public enum MinecraftGraphics implements AbstractGraphics {
         RenderSystem.enableBlend();
         RenderSystem.disableTexture();
         RenderSystem.defaultBlendFunc();
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
-        bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_COLOR);
         Matrix4f matrix4f = stack.last().pose();
         bufferBuilder.vertex(matrix4f, (float) x1, (float) y2, 0.0F).color(r, g, b, a).endVertex();
         bufferBuilder.vertex(matrix4f, (float) x2, (float) y2, 0.0F).color(r, g, b, a).endVertex();
@@ -109,14 +109,14 @@ public enum MinecraftGraphics implements AbstractGraphics {
     
     @Override
     public void bindTexture(String textureId) {
-        RenderSystem.setShaderTexture(0, new ResourceLocation(textureId));
+        Minecraft.getInstance().getTextureManager().bind(new ResourceLocation(textureId));
     }
     
     @Override
     public boolean bindTextureCustomStream(String textureId, Supplier<InputStream> supplier) {
         TextureManager manager = Minecraft.getInstance().getTextureManager();
         ResourceLocation location = new ResourceLocation(textureId);
-        if (manager.getTexture(location, null) == null) {
+        if (manager.getTexture(location) == null) {
             try {
                 NativeImage image = NativeImage.read(supplier.get());
                 DynamicTexture texture = new DynamicTexture(image);
@@ -126,7 +126,7 @@ public enum MinecraftGraphics implements AbstractGraphics {
                 return false;
             }
         }
-        RenderSystem.setShaderTexture(0, location);
+        Minecraft.getInstance().getTextureManager().bind(location);
         return true;
     }
     
@@ -161,12 +161,11 @@ public enum MinecraftGraphics implements AbstractGraphics {
         float r = (float) (color >> 16 & 255) / 255.0F;
         float g = (float) (color >> 8 & 255) / 255.0F;
         float b = (float) (color & 255) / 255.0F;
-        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
         RenderSystem.enableBlend();
         RenderSystem.enableTexture();
         RenderSystem.defaultBlendFunc();
         BufferBuilder bufferBuilder = Tesselator.getInstance().getBuilder();
-        bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+        bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
         Matrix4f matrix4f = stack.last().pose();
         bufferBuilder.vertex(matrix4f, (float) x1, (float) y2, (float) z).uv(u1, v2).color(r, g, b, a).endVertex();
         bufferBuilder.vertex(matrix4f, (float) x2, (float) y2, (float) z).uv(u2, v2).color(r, g, b, a).endVertex();

@@ -28,8 +28,7 @@ public enum EarlyGraphics implements AbstractGraphics {
     
     public static Font getFont() {
         if (font == null) {
-            JsonElement element = JsonParser.parseString("""
-                    {"type":"bitmap","file":"/assets/minecraft/textures/font/ascii.png","ascent":7,"chars":["\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000","\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000"," !\\"#$%&'()*+,-./","0123456789:;<=>?","@ABCDEFGHIJKLMNO","PQRSTUVWXYZ[\\\\]^_","`abcdefghijklmno","pqrstuvwxyz{|}~\\u0000","\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000","\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000£\\u0000\\u0000ƒ","\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000ªº\\u0000\\u0000¬\\u0000\\u0000\\u0000«»","░▒▓│┤╡╢╖╕╣║╗╝╜╛┐","└┴┬├─┼╞╟╚╔╩╦╠═╬╧","╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀","\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000∅∈\\u0000","≡±≥≤⌠⌡÷≈°∙\\u0000√\\u207f²■\\u0000"]}""");
+            JsonElement element = new JsonParser().parse("{\"type\":\"bitmap\",\"file\":\"/assets/minecraft/textures/font/ascii.png\",\"ascent\":7,\"chars\":[\"\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\",\"\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\",\" !\\\"#$%&'()*+,-./\",\"0123456789:;<=>?\",\"@ABCDEFGHIJKLMNO\",\"PQRSTUVWXYZ[\\\\]^_\",\"`abcdefghijklmno\",\"pqrstuvwxyz{|}~\\u0000\",\"\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\",\"\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000£\\u0000\\u0000ƒ\",\"\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000ªº\\u0000\\u0000¬\\u0000\\u0000\\u0000«»\",\"░▒▓│┤╡╢╖╕╣║╗╝╜╛┐\",\"└┴┬├─┼╞╟╚╔╩╦╠═╬╧\",\"╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀\",\"\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000∅∈\\u0000\",\"≡±≥≤⌠⌡÷≈°∙\\u0000√\\u207f²■\\u0000\"]}");
             FontLoader loader = FontLoader.fromJson(element.getAsJsonObject(), resolver);
             font = new Font(loader);
         }
@@ -88,7 +87,7 @@ public enum EarlyGraphics implements AbstractGraphics {
             ns = textureId.substring(0, column);
             path = textureId.substring(column + 1);
         }
-        return "/assets/%s/%s".formatted(ns, path);
+        return String.format("/assets/%s/%s", ns, path);
     }
     
     @Override
@@ -226,10 +225,13 @@ public enum EarlyGraphics implements AbstractGraphics {
         }
         
         public void draw(String text, float x, float y, int color, float dimFactor) {
+            GL11.glPushMatrix();
             float[] xx = new float[]{x};
             text.codePoints().forEach(value -> {
+                GL11.glTranslated(0, 0, 0.03F);
                 xx[0] += draw(xx[0], y, color, dimFactor, value);
             });
+            GL11.glPopMatrix();
         }
         
         public int width(String text) {

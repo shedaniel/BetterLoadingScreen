@@ -19,7 +19,9 @@ public class MixinMinecraft implements MinecraftStub {
     public void moveRenderOut() {
         if (!BetterLoadingScreen.isFurtherLoadingEnabled()) return;
         Runnable task = () -> {
-            RenderSystem.assertOnRenderThread();
+            if (!RenderSystem.isOnRenderThread()) {
+                throw new IllegalStateException("Cannot move render in from non-render thread");
+            }
             EarlyWindow.LOGGER.info("Moving render out");
             EarlyWindow.lock.lock();
             EarlyWindow.LOGGER.info("Acquired lock for render out");
@@ -52,7 +54,9 @@ public class MixinMinecraft implements MinecraftStub {
     public void moveRenderIn() {
         if (!BetterLoadingScreen.isFurtherLoadingEnabled()) return;
         Runnable task = () -> {
-            RenderSystem.assertOnRenderThread();
+            if (!RenderSystem.isOnRenderThread()) {
+                throw new IllegalStateException("Cannot move render in from non-render thread");
+            }
             EarlyWindow.LOGGER.info("Moving render in");
             EarlyWindow.lock.lock();
             int t = 0x10008;

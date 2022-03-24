@@ -21,11 +21,9 @@ public class DevelopmentDebugJobListener implements JobListener {
         levels.add(task.getIdentifier());
         MultiTask parent = null;
         while ((parent = parent == null ? task.getParent() : ((Task<?>) parent).getParent()) != null) {
-            if (parent instanceof Job job) {
-                levels.add(job.getIdentifier());
+            levels.add(parent.getIdentifier());
+            if (parent instanceof Job) {
                 break;
-            } else {
-                levels.add(((Task<?>) parent).getIdentifier());
             }
         }
         
@@ -45,11 +43,9 @@ public class DevelopmentDebugJobListener implements JobListener {
         levels.add(task.getIdentifier());
         MultiTask parent = null;
         while ((parent = parent == null ? task.getParent() : ((Task<?>) parent).getParent()) != null) {
-            if (parent instanceof Job job) {
-                levels.add(job.getIdentifier());
+            levels.add(parent.getIdentifier());
+            if (parent instanceof Job) {
                 break;
-            } else {
-                levels.add(((Task<?>) parent).getIdentifier());
             }
         }
         

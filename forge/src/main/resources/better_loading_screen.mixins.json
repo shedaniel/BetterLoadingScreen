@@ -2,9 +2,10 @@
   "required": true,
   "package": "me.shedaniel.betterloadingscreen.mixin.forge",
   "plugin": "me.shedaniel.betterloadingscreen.forge.BetterLoadingScreenForgeMixinPlugin",
-  "compatibilityLevel": "JAVA_16",
+  "compatibilityLevel": "JAVA_8",
   "client": [
     "MixinClientModLoader",
+    "MixinEarlyLoaderGUI",
     "MixinForgeHooksClient",
     "MixinGameData",
     "MixinModelBakeryForge",

@@ -73,12 +73,12 @@ public class MixinModelBakery implements ModelBakeryStub {
         LoadGameSteps.bakeModel().setTotalSteps(topLevelModels.size());
     }
     
-    @Inject(method = {"method_4733", "lambda$uploadTextures$12", "m_119368_"}, at = @At("HEAD"))
+    @Inject(method = {"method_4733", "lambda$uploadTextures$12", "func_229350_e_"}, at = @At("HEAD"))
     private void startBaking(ResourceLocation resourceLocation, CallbackInfo ci) {
         LoadGameSteps.bakeModel().setCurrentStepInfo(resourceLocation.toString());
     }
     
-    @Inject(method = {"method_4733", "lambda$uploadTextures$12", "m_119368_"}, at = @At("RETURN"))
+    @Inject(method = {"method_4733", "lambda$uploadTextures$12", "func_229350_e_"}, at = @At("RETURN"))
     private void endBaking(ResourceLocation resourceLocation, CallbackInfo ci) {
         LoadGameSteps.bakeModel().incrementStep();
     }
