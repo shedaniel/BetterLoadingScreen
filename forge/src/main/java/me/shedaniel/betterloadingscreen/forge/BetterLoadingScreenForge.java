@@ -1,41 +1,22 @@
 package me.shedaniel.betterloadingscreen.forge;
 
 import me.shedaniel.betterloadingscreen.BetterLoadingScreen;
-import me.shedaniel.betterloadingscreen.api.step.LoadGameSteps;
-import me.shedaniel.betterloadingscreen.api.step.SteppedTask;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.ExtensionPoint;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.RegistryManager;
-
-import java.lang.reflect.Field;
-import java.util.Map;
+import net.minecraftforge.fml.loading.FMLLoader;
+import net.minecraftforge.fml.network.FMLNetworkConstants;
+import org.apache.commons.lang3.tuple.Pair;
 
 @Mod(BetterLoadingScreen.MOD_ID)
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class BetterLoadingScreenForge {
     public BetterLoadingScreenForge() {
-        BetterLoadingScreen.init();
-    }
-    
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public static void register(RegistryEvent.Register register) {
-        SteppedTask content = LoadGameSteps.registeringContent();
-        try {
-            Field field = RegistryManager.class.getDeclaredField("registries");
-            field.setAccessible(true);
-            Map o = (Map) field.get(RegistryManager.ACTIVE);
-            content.setTotalSteps(o.size());
-            content.setCurrentStepInfo(register.getRegistry().getRegistryName().toString());
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
+        ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST, () -> Pair.of(
+                () -> FMLNetworkConstants.IGNORESERVERONLY,
+                (s, b) -> true));
+        if (FMLLoader.getDist() == Dist.CLIENT) {
+            BetterLoadingScreen.init();
         }
-    }
-    
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void registerPost(RegistryEvent.Register register) {
-        SteppedTask content = LoadGameSteps.registeringContent();
-        content.incrementStep();
     }
 }
