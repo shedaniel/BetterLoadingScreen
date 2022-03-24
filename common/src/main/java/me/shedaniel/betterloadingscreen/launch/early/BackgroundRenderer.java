@@ -50,8 +50,8 @@ public interface BackgroundRenderer {
                 
                 return new BackgroundRenderer() {
                     @Override
-                    public void render(AbstractGraphics graphics) {
-                        GL11.glClearColor(ARGB32.red(bgColor) / 255.0F, ARGB32.green(bgColor) / 255.0F, ARGB32.blue(bgColor) / 255.0F, ARGB32.alpha(bgColor));
+                    public int getBackgroundColor() {
+                        return bgColor;
                     }
                     
                     @Override
@@ -84,9 +84,8 @@ public interface BackgroundRenderer {
     
     BackgroundRenderer DEFAULT = new BackgroundRenderer() {
         @Override
-        public void render(AbstractGraphics graphics) {
-            int bgColor = BetterLoadingScreenConfig.getColor(BetterLoadingScreen.CONFIG.backgroundColor, 0x2E3440);
-            GL11.glClearColor(ARGB32.red(bgColor) / 255.0F, ARGB32.green(bgColor) / 255.0F, ARGB32.blue(bgColor) / 255.0F, 1.0F);
+        public int getBackgroundColor() {
+            return BetterLoadingScreenConfig.getColor(BetterLoadingScreen.CONFIG.backgroundColor, 0x2E3440) | 0xFF000000;
         }
         
         @Override
@@ -130,6 +129,11 @@ public interface BackgroundRenderer {
             }
             
             @Override
+            public int getBackgroundColor() {
+                return parent.getBackgroundColor();
+            }
+            
+            @Override
             public int getBarColor() {
                 return parent.getBarColor();
             }
@@ -159,6 +163,11 @@ public interface BackgroundRenderer {
             }
             
             @Override
+            public int getBackgroundColor() {
+                return parent.getBackgroundColor();
+            }
+            
+            @Override
             public int getBarColor() {
                 return parent.getBarColor();
             }
@@ -180,7 +189,12 @@ public interface BackgroundRenderer {
         };
     }
     
-    void render(AbstractGraphics graphics);
+    default void render(AbstractGraphics graphics) {
+        int bgColor = getBackgroundColor();
+        GL11.glClearColor(ARGB32.red(bgColor) / 255.0F, ARGB32.green(bgColor) / 255.0F, ARGB32.blue(bgColor) / 255.0F, ARGB32.alpha(bgColor));
+    }
+    
+    int getBackgroundColor();
     
     int getBarColor();
     
