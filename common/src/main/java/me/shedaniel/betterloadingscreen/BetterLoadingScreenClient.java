@@ -65,6 +65,7 @@ public class BetterLoadingScreenClient {
         }
         int i = 0;
         int padding = 6;
+        if (taskSize == 0) return;
         for (Task<?> task : job.getTasks()) {
             if (showAll || (task.isActive() && !task.isCompleted())) {
                 int x = centerX - width / 2 + (width + 6) / taskSize * i++;
