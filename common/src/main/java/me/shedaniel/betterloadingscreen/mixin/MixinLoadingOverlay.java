@@ -73,8 +73,10 @@ public abstract class MixinLoadingOverlay {
             target = "Lnet/minecraft/client/gui/screens/LoadingOverlay;blit(Lcom/mojang/blaze3d/vertex/PoseStack;IIIIFFIIII)V"
     ))
     private void blit(PoseStack poseStack, int x, int y, int width, int height, float u, float v, int uWidth, int vHeight, int texWidth, int texHeight) {
-        int logoColor = BetterLoadingScreenConfig.getColor(BetterLoadingScreen.CONFIG.logoColor, 0xFFFFFF) | 0xFF000000;
-        MinecraftGraphics.INSTANCE.blit(x, y, width, height, u, v, uWidth, vHeight, texWidth, texHeight, logoColor);
+        if (BetterLoadingScreen.CONFIG.rendersLogo) {
+            int logoColor = BetterLoadingScreenConfig.getColor(BetterLoadingScreen.CONFIG.logoColor, 0xFFFFFF) | 0xFF000000;
+            MinecraftGraphics.INSTANCE.blit(x, y, width, height, u, v, uWidth, vHeight, texWidth, texHeight, logoColor);
+        }
     }
     
     @Unique
