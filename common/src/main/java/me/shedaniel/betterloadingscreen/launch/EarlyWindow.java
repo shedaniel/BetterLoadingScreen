@@ -234,7 +234,9 @@ public class EarlyWindow {
         EarlyGraphics graphics = EarlyGraphics.INSTANCE;
         timer.advanceTime(System.currentTimeMillis());
         renderer.render(graphics);
-        renderer.renderLogo(BetterLoadingScreenConfig.getColor(BetterLoadingScreen.CONFIG.logoColor, 0xFFFFFF) | 0xFF000000);
+        if (BetterLoadingScreen.CONFIG.rendersLogo) {
+            renderer.renderLogo(BetterLoadingScreenConfig.getColor(BetterLoadingScreen.CONFIG.logoColor, 0xFFFFFF) | 0xFF000000);
+        }
         BetterLoadingScreenClient.renderOverlay(graphics, 0, 0, timer.tickDelta, 1.0F);
         for (EarlyWindowHook hook : BetterLoadingScreenClient.hooks) {
             hook.render(graphics, timer.tickDelta);
