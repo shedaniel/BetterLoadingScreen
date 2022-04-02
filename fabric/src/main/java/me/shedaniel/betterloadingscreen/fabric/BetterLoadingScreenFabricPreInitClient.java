@@ -19,7 +19,12 @@ public class BetterLoadingScreenFabricPreInitClient {
     public static final Logger LOGGER = LogManager.getLogger(BetterLoadingScreenFabricPreInitClient.class);
     
     public static void onPreLaunch() {
-        Tasks.MAIN.reset(Tasks.LAUNCH_COUNT);
+        if (FabricLoader.getInstance().isModLoaded("dashloader")) {
+            LOGGER.info("Found DashLoader");
+            Tasks.MAIN.reset(Tasks.LAUNCH_COUNT + 1);
+        } else {
+            Tasks.MAIN.reset(Tasks.LAUNCH_COUNT);
+        }
         EarlyGraphics.resolver = url -> {
             Path path = Objects.requireNonNull(FabricLoader.getInstance().getModContainer("minecraft").get().getPath(url), "Resource not found: " + url);
             try {

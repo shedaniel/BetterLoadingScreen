@@ -49,6 +49,10 @@ public class BetterLoadingScreenClient {
 	}
 
 	private static void drawTask(GraphicsBackend graphics, int textColor, float alpha, int x, int width, int y, Task task, BackgroundRenderer renderer) {
+		if ((y + 10) > graphics.getScaledHeight()) {
+			return;
+		}
+
 		if (alpha > 0.02F) {
 			graphics.drawString(task.getName(), x, y - 10, textColor);
 		}

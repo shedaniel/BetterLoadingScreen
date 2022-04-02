@@ -17,6 +17,12 @@
       "me.shedaniel.betterloadingscreen.fabric.BetterLoadingScreenFabricPreInit"
     ]
   },
+
+  "custom": {
+    "dashloader:hook" : [
+      "me.shedaniel.betterloadingscreen.compat.DashLoaderCompat"
+    ]
+  },
   "mixins": [
     "better_loading_screen.mixins.json",
     "better_loading_screen-common.mixins.json"
