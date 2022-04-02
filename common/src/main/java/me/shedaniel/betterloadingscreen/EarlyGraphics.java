@@ -5,10 +5,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import me.shedaniel.betterloadingscreen.api.render.ARGB32;
-import me.shedaniel.betterloadingscreen.api.render.AbstractGraphics;
 import me.shedaniel.betterloadingscreen.launch.EarlyWindow;
 import me.shedaniel.betterloadingscreen.launch.early.*;
+import me.shedaniel.betterloadingscreen.launch.early.Image;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
@@ -16,9 +15,10 @@ import org.lwjgl.opengl.GL11;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.List;
 import java.util.function.Supplier;
 
-public enum EarlyGraphics implements AbstractGraphics {
+public enum EarlyGraphics implements GraphicsBackend {
     INSTANCE;
     
     public static final Logger LOGGER = LogManager.getLogger(EarlyGraphics.class);
@@ -55,16 +55,10 @@ public enum EarlyGraphics implements AbstractGraphics {
             y1 = y2;
             y2 = tmp;
         }
-        
-        float a = (float) (color >> 24 & 255) / 255.0F;
-        float r = (float) (color >> 16 & 255) / 255.0F;
-        float g = (float) (color >> 8 & 255) / 255.0F;
-        float b = (float) (color & 255) / 255.0F;
-        
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glBegin(GL11.GL_QUADS);
-        GL11.glColor4f(r, g, b, a);
+        GL11.glColor4f(ColorUtil.rF(color), ColorUtil.gF(color), ColorUtil.bF(color), ColorUtil.aF(color));
         GL11.glVertex2f(x1, y2);
         GL11.glVertex2f(x2, y2);
         GL11.glVertex2f(x2, y1);
@@ -101,13 +95,7 @@ public enum EarlyGraphics implements AbstractGraphics {
         y = getScaledHeight() - y;
         getFont().draw(string, x, y - 8, color, 1.0F);
     }
-    
-    @Override
-    public void drawStringWithShadow(String string, int x, int y, int color) {
-        getFont().draw(string, x + 1, getScaledHeight() - (y + 1) - 8, color, 0.25F);
-        getFont().draw(string, x, getScaledHeight() - y - 8, color, 1.0F);
-    }
-    
+
     @Override
     public int width(String string) {
         return getFont().width(string);
@@ -131,10 +119,7 @@ public enum EarlyGraphics implements AbstractGraphics {
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GL11.glColor4f(ARGB32.red(color) / 255.0F,
-                ARGB32.green(color) / 255.0F,
-                ARGB32.blue(color) / 255.0F,
-                ARGB32.alpha(color) / 255.0F);
+        GL11.glColor4f(ColorUtil.rF(color), ColorUtil.gF(color), ColorUtil.bF(color), ColorUtil.aF(color));
         GL11.glBegin(GL11.GL_QUADS);
         
         GL11.glTexCoord2f(u1, v2);
@@ -237,10 +222,7 @@ public enum EarlyGraphics implements AbstractGraphics {
         }
         
         public float draw(float x, float y, int color, float dimFactor, int codepoint) {
-            return draw(x, y, ARGB32.red(color) / 255F,
-                    ARGB32.green(color) / 255F,
-                    ARGB32.blue(color) / 255F,
-                    ARGB32.alpha(color) / 255F, dimFactor, codepoint);
+            return draw(x, y, ColorUtil.rF(color), ColorUtil.gF(color), ColorUtil.bF(color), ColorUtil.aF(color), dimFactor, codepoint);
         }
         
         public float draw(float x, float y, float r, float g, float b, float a, float dimFactor, int codepoint) {

@@ -3,12 +3,12 @@ package me.shedaniel.betterloadingscreen.launch.early;
 import me.shedaniel.betterloadingscreen.BetterLoadingScreen;
 import me.shedaniel.betterloadingscreen.BetterLoadingScreenConfig;
 import me.shedaniel.betterloadingscreen.EarlyGraphics;
-import me.shedaniel.betterloadingscreen.api.render.ARGB32;
-import me.shedaniel.betterloadingscreen.api.render.AbstractGraphics;
+import me.shedaniel.betterloadingscreen.GraphicsBackend;
 import net.minecraft.util.StringUtil;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 
+import java.awt.*;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -114,7 +114,7 @@ public interface BackgroundRenderer {
             private Optional<String> background = Optional.empty();
             
             @Override
-            public void render(AbstractGraphics graphics) {
+            public void render(GraphicsBackend graphics) {
                 if (background.isEmpty()) {
                     String name = path.toString();
                     if (graphics.bindTextureCustom(name, () -> path)) {
@@ -124,7 +124,7 @@ public interface BackgroundRenderer {
                 
                 if (background.isPresent()) {
                     graphics.bindTexture(background.get());
-                    graphics.innerBlit(0, graphics.getScaledWidth(), 0, graphics.getScaledHeight(), 0, 0, 1, 0, 1, 0xFFFFFFFF);
+                    graphics.innerBlit(0, graphics.getScaledWidth(), 0, graphics.getScaledHeight(), 0, 0, 1, 0, 1,0xffffffff);
                 }
             }
             
@@ -158,7 +158,7 @@ public interface BackgroundRenderer {
     static BackgroundRenderer wrapWithLogo(BackgroundRenderer parent, Path path, int color) {
         return new BackgroundRenderer() {
             @Override
-            public void render(AbstractGraphics graphics) {
+            public void render(GraphicsBackend graphics) {
                 parent.render(graphics);
             }
             
@@ -189,9 +189,10 @@ public interface BackgroundRenderer {
         };
     }
     
-    default void render(AbstractGraphics graphics) {
+    default void render(GraphicsBackend graphics) {
         int bgColor = getBackgroundColor();
-        GL11.glClearColor(ARGB32.red(bgColor) / 255.0F, ARGB32.green(bgColor) / 255.0F, ARGB32.blue(bgColor) / 255.0F, ARGB32.alpha(bgColor));
+        Color color = new Color(bgColor, true);
+        GL11.glClearColor(color.getRed() / 255.0F, color.getGreen() / 255.0F, color.getBlue()/ 255.0F, color.getTransparency() / 255.0F);
     }
     
     int getBackgroundColor();

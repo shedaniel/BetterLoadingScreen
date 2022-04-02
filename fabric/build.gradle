@@ -33,6 +33,7 @@ dependencies {
 
 //    modImplementation 'curse.maven:optifabric-322385:3568115'
 //    modImplementation 'com.github.Chocohead:OptiFabric:215640d9ad'
+    include "dev.quantumfusion:taski:1.1.0"
 
     implementation("blue.endless:jankson:1.2.1")
     shadowCommon("blue.endless:jankson:1.2.1")

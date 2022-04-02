@@ -3,7 +3,7 @@ package me.shedaniel.betterloadingscreen.fabric;
 import me.shedaniel.betterloadingscreen.BetterLoadingScreen;
 import me.shedaniel.betterloadingscreen.BetterLoadingScreenClient;
 import me.shedaniel.betterloadingscreen.EarlyGraphics;
-import me.shedaniel.betterloadingscreen.launch.BetterLoadingScreenPreInit;
+import me.shedaniel.betterloadingscreen.Tasks;
 import me.shedaniel.betterloadingscreen.launch.EarlyWindow;
 import me.shedaniel.betterloadingscreen.launch.early.BackgroundRenderer;
 import net.fabricmc.loader.api.FabricLoader;
@@ -19,7 +19,7 @@ public class BetterLoadingScreenFabricPreInitClient {
     public static final Logger LOGGER = LogManager.getLogger(BetterLoadingScreenFabricPreInitClient.class);
     
     public static void onPreLaunch() {
-        BetterLoadingScreenPreInit.init(true);
+        Tasks.MAIN.reset(Tasks.LAUNCH_COUNT);
         EarlyGraphics.resolver = url -> {
             Path path = Objects.requireNonNull(FabricLoader.getInstance().getModContainer("minecraft").get().getPath(url), "Resource not found: " + url);
             try {

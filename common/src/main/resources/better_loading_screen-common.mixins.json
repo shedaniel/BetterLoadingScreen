@@ -8,11 +8,12 @@
     "MixinLoadingOverlay",
     "MixinMinecraft",
     "MixinModelBakery",
-    "MixinTextureAtlas",
     "MixinStitcher",
+    "MixinTextureAtlas",
     "MixinWindow"
   ],
   "mixins": [
+    "MixinBuiltinRegistries"
   ],
   "injectors": {
     "defaultRequire": 1

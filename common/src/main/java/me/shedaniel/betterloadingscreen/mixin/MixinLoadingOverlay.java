@@ -117,7 +117,7 @@ public abstract class MixinLoadingOverlay {
         if (hasCustomBackground) {
             RenderSystem.setShaderTexture(0, BACKGROUND_PATH);
             MinecraftGraphics.INSTANCE.innerBlit(0, minecraft.getWindow().getGuiScaledWidth(), 0, minecraft.getWindow().getGuiScaledHeight(),
-                    0, 0, 1, 0, 1, 0xFFFFFFFF);
+                    0, 0, 1, 0, 1, 0xffffffff);
         }
     }
 }
