@@ -124,7 +124,7 @@ public interface BackgroundRenderer {
                 
                 if (background.isPresent()) {
                     graphics.bindTexture(background.get());
-                    graphics.innerBlit(0, graphics.getScaledWidth(), 0, graphics.getScaledHeight(), 0, 0, 1, 0, 1,0xffffffff);
+                    graphics.innerBlit(0, graphics.getScaledWidth(), 0, graphics.getScaledHeight(), 0, 0, 1, 0, 1, 0xffffffff);
                 }
             }
             
@@ -192,7 +192,7 @@ public interface BackgroundRenderer {
     default void render(GraphicsBackend graphics) {
         int bgColor = getBackgroundColor();
         Color color = new Color(bgColor, true);
-        GL11.glClearColor(color.getRed() / 255.0F, color.getGreen() / 255.0F, color.getBlue()/ 255.0F, color.getTransparency() / 255.0F);
+        GL11.glClearColor(color.getRed() / 255.0F, color.getGreen() / 255.0F, color.getBlue() / 255.0F, color.getTransparency() / 255.0F);
     }
     
     int getBackgroundColor();

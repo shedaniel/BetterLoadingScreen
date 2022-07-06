@@ -35,26 +35,26 @@ public class BakedGlyph {
         float y2 = y + q;
         float xo1 = italic ? 1.0F - 0.25F * p : 0.0F;
         float xo2 = italic ? 1.0F - 0.25F * q : 0.0F;
-    
+        
         EarlyGraphics._bindTexture(texture);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glColor4f(r, g, b, a);
         GL11.glBegin(GL11.GL_QUADS);
-
+        
         GL11.glTexCoord2f(u0, v0);
         GL11.glVertex3f(x1 + xo1, y2, 0.0F);
-
+        
         GL11.glTexCoord2f(u0, v1);
         GL11.glVertex3f(x1 + xo2, y1, 0.0F);
-
+        
         GL11.glTexCoord2f(u1, v1);
         GL11.glVertex3f(x2 + xo2, y1, 0.0F);
-
+        
         GL11.glTexCoord2f(u1, v0);
         GL11.glVertex3f(x2 + xo1, y2, 0.0F);
-
+        
         GL11.glEnd();
         GL11.glDisable(GL11.GL_TEXTURE_2D);
     }

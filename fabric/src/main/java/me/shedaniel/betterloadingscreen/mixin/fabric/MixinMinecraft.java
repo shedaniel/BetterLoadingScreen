@@ -25,47 +25,47 @@ import java.util.function.Supplier;
 
 @Mixin(Minecraft.class)
 public abstract class MixinMinecraft {
-	@SuppressWarnings({"MixinAnnotationTarget", "UnresolvedMixinReference", "InvalidInjectorMethodSignature"})
-	@Redirect(at = @At(
-			value = "INVOKE",
-			target = "Lnet/fabricmc/loader/impl/game/minecraft/Hooks;startClient(Ljava/io/File;Ljava/lang/Object;)V"
-	), method = "<init>")
-	private void init(File runDir, Object gameInstance) {
-		if (runDir == null) {
-			runDir = new File(".");
-		}
-		List<EntrypointContainer<ModInitializer>> commonContainers = FabricLoader.getInstance().getEntrypointContainers("main", ModInitializer.class);
-		List<EntrypointContainer<ClientModInitializer>> clientContainers = FabricLoader.getInstance().getEntrypointContainers("client", ClientModInitializer.class);
-
-		FabricLoaderImpl.INSTANCE.prepareModInit(runDir.toPath(), gameInstance);
-		StepTask common = new StepTask("Common", commonContainers.size());
-		StepTask client = new StepTask("Client", clientContainers.size());
-		Tasks.MAIN.setSubTask(new StageTask("Loading Mods", common, client));
-		invoke("main", commonContainers, common, ModInitializer::onInitialize);
-		invoke("client", clientContainers, client, ClientModInitializer::onInitializeClient);
-		Tasks.MAIN.next();
-	}
-
-	@Unique
-	private static <T> void invoke(String name, List<EntrypointContainer<T>> containers, StepTask task, Consumer<T> invoker) {
-		RuntimeException exception = null;
-		task.reset(containers.size());
-		for (EntrypointContainer<T> container : containers) {
-			try {
-				invoker.accept(container.getEntrypoint());
-			} catch (Throwable t) {
-				exception = ExceptionUtil.gatherExceptions(t,
-						exception,
-						exc -> new RuntimeException(String.format("Could not execute entrypoint stage '%s' due to errors, provided by '%s'!",
-								name, container.getProvider().getMetadata().getId()),
-								exc));
-			}
-
-			task.next();
-		}
-
-		if (exception != null) {
-			throw exception;
-		}
-	}
+    @SuppressWarnings({"MixinAnnotationTarget", "UnresolvedMixinReference", "InvalidInjectorMethodSignature"})
+    @Redirect(at = @At(
+            value = "INVOKE",
+            target = "Lnet/fabricmc/loader/impl/game/minecraft/Hooks;startClient(Ljava/io/File;Ljava/lang/Object;)V"
+    ), method = "<init>")
+    private void init(File runDir, Object gameInstance) {
+        if (runDir == null) {
+            runDir = new File(".");
+        }
+        List<EntrypointContainer<ModInitializer>> commonContainers = FabricLoader.getInstance().getEntrypointContainers("main", ModInitializer.class);
+        List<EntrypointContainer<ClientModInitializer>> clientContainers = FabricLoader.getInstance().getEntrypointContainers("client", ClientModInitializer.class);
+        
+        FabricLoaderImpl.INSTANCE.prepareModInit(runDir.toPath(), gameInstance);
+        StepTask common = new StepTask("Common", commonContainers.size());
+        StepTask client = new StepTask("Client", clientContainers.size());
+        Tasks.MAIN.setSubTask(new StageTask("Loading Mods", common, client));
+        invoke("main", commonContainers, common, ModInitializer::onInitialize);
+        invoke("client", clientContainers, client, ClientModInitializer::onInitializeClient);
+        Tasks.MAIN.next();
+    }
+    
+    @Unique
+    private static <T> void invoke(String name, List<EntrypointContainer<T>> containers, StepTask task, Consumer<T> invoker) {
+        RuntimeException exception = null;
+        task.reset(containers.size());
+        for (EntrypointContainer<T> container : containers) {
+            try {
+                invoker.accept(container.getEntrypoint());
+            } catch (Throwable t) {
+                exception = ExceptionUtil.gatherExceptions(t,
+                        exception,
+                        exc -> new RuntimeException(String.format("Could not execute entrypoint stage '%s' due to errors, provided by '%s'!",
+                                name, container.getProvider().getMetadata().getId()),
+                                exc));
+            }
+            
+            task.next();
+        }
+        
+        if (exception != null) {
+            throw exception;
+        }
+    }
 }

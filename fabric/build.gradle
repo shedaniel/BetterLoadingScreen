@@ -33,10 +33,10 @@ dependencies {
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
 
-    modCompileOnly "dev.quantumfusion.dashloader:dashloader-definitions:3.2.0+1.18"
+//    modCompileOnly "dev.quantumfusion.dashloader:dashloader-definitions:3.2.0+1.18"
 //    modImplementation 'curse.maven:optifabric-322385:3568115'
 //    modImplementation 'com.github.Chocohead:OptiFabric:215640d9ad'
-    include "dev.quantumfusion:taski:1.1.0"
+    include "dev.quantumfusion:Taski:1.1.0"
 
     implementation("blue.endless:jankson:1.2.1")
     shadowCommon("blue.endless:jankson:1.2.1")

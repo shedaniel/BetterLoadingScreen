@@ -95,7 +95,7 @@ public enum EarlyGraphics implements GraphicsBackend {
         y = getScaledHeight() - y;
         getFont().draw(string, x, y - 8, color, 1.0F);
     }
-
+    
     @Override
     public int width(String string) {
         return getFont().width(string);
