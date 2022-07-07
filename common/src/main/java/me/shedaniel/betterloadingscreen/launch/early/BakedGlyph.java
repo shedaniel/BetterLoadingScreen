@@ -1,6 +1,9 @@
 package me.shedaniel.betterloadingscreen.launch.early;
 
 import me.shedaniel.betterloadingscreen.EarlyGraphics;
+import me.shedaniel.betterloadingscreen.launch.render.EarlyBufferBuilder;
+import me.shedaniel.betterloadingscreen.launch.render.EarlyDrawType;
+import me.shedaniel.betterloadingscreen.launch.render.EarlyRenderFormat;
 import org.lwjgl.opengl.GL11;
 
 public class BakedGlyph {
@@ -38,24 +41,12 @@ public class BakedGlyph {
         
         EarlyGraphics._bindTexture(texture);
         GL11.glEnable(GL11.GL_BLEND);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GL11.glColor4f(r, g, b, a);
-        GL11.glBegin(GL11.GL_QUADS);
-        
-        GL11.glTexCoord2f(u0, v0);
-        GL11.glVertex3f(x1 + xo1, y2, 0.0F);
-        
-        GL11.glTexCoord2f(u0, v1);
-        GL11.glVertex3f(x1 + xo2, y1, 0.0F);
-        
-        GL11.glTexCoord2f(u1, v1);
-        GL11.glVertex3f(x2 + xo2, y1, 0.0F);
-        
-        GL11.glTexCoord2f(u1, v0);
-        GL11.glVertex3f(x2 + xo1, y2, 0.0F);
-        
-        GL11.glEnd();
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        EarlyBufferBuilder builder = new EarlyBufferBuilder("position_color_tex", EarlyRenderFormat.POSITION_COLOR_TEX);
+        builder.pos(x1 + xo1, y2, 0.0F).color(r, g, b, a).tex(u0, v1).endVertex();
+        builder.pos(x1 + xo2, y1, 0.0F).color(r, g, b, a).tex(u0, v0).endVertex();
+        builder.pos(x2 + xo2, y1, 0.0F).color(r, g, b, a).tex(u1, v0).endVertex();
+        builder.pos(x2 + xo1, y2, 0.0F).color(r, g, b, a).tex(u1, v1).endVertex();
+        builder.end(EarlyDrawType.QUAD);
     }
 }

@@ -3,13 +3,17 @@ package me.shedaniel.betterloadingscreen;
 import dev.quantumfusion.taski.builtin.StepTask;
 
 public class Tasks {
-    public static int CLIENT_TASK_COUNT = 2;
-    public static int LAUNCH_COUNT = CLIENT_TASK_COUNT + 2;
+    public static int LAUNCH_COUNT(boolean forge) {
+        return !forge ? 4 : 7;
+    }
     
+    // Forge: Scanning Mods
     // Bootstrap
-    // ModLoading
+    // Loading Mods
     // - Common
     // - Client
+    // Forge: Registry
+    // Forge: Finalize Registry
     // Loading Assets
     // * Blocks
     // * Items

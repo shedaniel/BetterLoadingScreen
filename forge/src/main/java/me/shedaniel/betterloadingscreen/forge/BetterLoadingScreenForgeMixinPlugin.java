@@ -3,6 +3,7 @@ package me.shedaniel.betterloadingscreen.forge;
 import me.shedaniel.betterloadingscreen.BetterLoadingScreen;
 import me.shedaniel.betterloadingscreen.BetterLoadingScreenClient;
 import me.shedaniel.betterloadingscreen.EarlyGraphics;
+import me.shedaniel.betterloadingscreen.Tasks;
 import me.shedaniel.betterloadingscreen.launch.EarlyWindow;
 import me.shedaniel.betterloadingscreen.launch.early.BackgroundRenderer;
 import net.minecraftforge.api.distmarker.Dist;
@@ -38,7 +39,7 @@ public class BetterLoadingScreenForgeMixinPlugin implements IMixinConfigPlugin {
     
     public static class Client {
         public static void run() {
-            BetterLoadingScreenPreInit.init(false);
+            Tasks.MAIN.reset(Tasks.LAUNCH_COUNT(true));
             EarlyGraphics.resolver = url -> {
                 return Objects.requireNonNull(EarlyGraphics.class.getClassLoader().getResourceAsStream(url), "Resource not found: " + url);
             };

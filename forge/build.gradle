@@ -36,6 +36,9 @@ dependencies {
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
 
+    shadowCommon("dev.quantumfusion:Taski:1.1.0")
+    forgeRuntimeLibrary("dev.quantumfusion:Taski:1.1.0")
+
     implementation("blue.endless:jankson:1.2.1")
     forgeRuntimeLibrary("blue.endless:jankson:1.2.1")
     shadowCommon("blue.endless:jankson:1.2.1")

@@ -1,8 +1,8 @@
 package me.shedaniel.betterloadingscreen.forge;
 
+import dev.quantumfusion.taski.builtin.StepTask;
 import me.shedaniel.betterloadingscreen.BetterLoadingScreen;
-import me.shedaniel.betterloadingscreen.api.step.LoadGameSteps;
-import me.shedaniel.betterloadingscreen.api.step.SteppedTask;
+import me.shedaniel.betterloadingscreen.Tasks;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -18,13 +18,13 @@ import java.util.Map;
 public class BetterLoadingScreenForgeRegistryListener {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void register(RegistryEvent.Register register) {
-        SteppedTask content = LoadGameSteps.registeringContent();
         try {
             Field field = RegistryManager.class.getDeclaredField("registries");
             field.setAccessible(true);
             Map o = (Map) field.get(RegistryManager.ACTIVE);
-            content.setTotalSteps(o.size());
-            content.setCurrentStepInfo(register.getRegistry().getRegistryName().toString());
+            StepTask task = new StepTask("Registering Content", o.size());
+            Tasks.MAIN.setSubTask(task);
+            System.out.println(register.getRegistry().getRegistryName().toString());
         } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
         }
@@ -32,7 +32,10 @@ public class BetterLoadingScreenForgeRegistryListener {
     
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void registerPost(RegistryEvent.Register register) {
-        SteppedTask content = LoadGameSteps.registeringContent();
-        content.incrementStep();
+        StepTask subTask = (StepTask) Tasks.MAIN.getSubTask();
+        subTask.next();
+        if (subTask.getCurrent() == subTask.getTotal()) {
+            Tasks.MAIN.next();
+        }
     }
 }

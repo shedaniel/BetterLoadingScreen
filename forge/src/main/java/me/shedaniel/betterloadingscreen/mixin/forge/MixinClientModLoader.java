@@ -1,7 +1,7 @@
 package me.shedaniel.betterloadingscreen.mixin.forge;
 
-import me.shedaniel.betterloadingscreen.api.step.LoadGameSteps;
-import me.shedaniel.betterloadingscreen.api.step.SteppedTask;
+import dev.quantumfusion.taski.builtin.StepTask;
+import me.shedaniel.betterloadingscreen.Tasks;
 import me.shedaniel.betterloadingscreen.impl.mixinstub.MinecraftStub;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.ClientPackSource;
@@ -39,7 +39,8 @@ public class MixinClientModLoader {
                     if ("Dispatching gathering events".equals(s)) {
                         try {
                             int[] count = {0};
-                            SteppedTask modsForge = LoadGameSteps.initModsForge();
+                            StepTask task = new StepTask("Loading Mods");
+                            Tasks.MAIN.setSubTask(task);
                             Field activityMap = ModContainer.class.getDeclaredField("activityMap");
                             activityMap.setAccessible(true);
                             ModList modList = ModList.get();
@@ -50,11 +51,14 @@ public class MixinClientModLoader {
                                         Map<ModLoadingStage, Runnable> map = (Map<ModLoadingStage, Runnable>) activityMap.get(container);
                                         Runnable runnable = map.getOrDefault(ModLoadingStage.CONSTRUCT, () -> {});
                                         map.put(ModLoadingStage.CONSTRUCT, () -> {
-                                            modsForge.setCurrentStepInfo(mod.getDisplayName());
+                                            System.out.println(mod.getDisplayName());
                                             try {
                                                 runnable.run();
                                             } finally {
-                                                modsForge.incrementStep();
+                                                task.next();
+                                                if (task.getCurrent() == task.getTotal()) {
+                                                    Tasks.MAIN.next();
+                                                }
                                             }
                                         });
                                     } catch (Throwable throwable) {
@@ -62,7 +66,7 @@ public class MixinClientModLoader {
                                     }
                                 });
                             }
-                            modsForge.setTotalSteps(count[0]);
+                            task.reset(count[0]);
                         } catch (Throwable throwable) {
                             throwable.printStackTrace();
                         }

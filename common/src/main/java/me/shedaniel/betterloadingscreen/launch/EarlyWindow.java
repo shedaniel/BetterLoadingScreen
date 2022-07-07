@@ -5,8 +5,12 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.sun.jna.Pointer;
 import me.shedaniel.betterloadingscreen.*;
-import me.shedaniel.betterloadingscreen.EarlyGraphics;
 import me.shedaniel.betterloadingscreen.launch.early.BackgroundRenderer;
+import me.shedaniel.betterloadingscreen.launch.render.EarlyBufferBuilder;
+import me.shedaniel.betterloadingscreen.launch.render.EarlyDrawType;
+import me.shedaniel.betterloadingscreen.launch.render.EarlyRenderFormat;
+import me.shedaniel.betterloadingscreen.launch.render.EarlyRenderingStates;
+import me.shedaniel.betterloadingscreen.launch.render.math.Matrix4f;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,8 +19,7 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWNativeCocoa;
 import org.lwjgl.glfw.GLFWVidMode;
-import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.*;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -43,7 +46,7 @@ public class EarlyWindow {
     public static Lock lock = new ReentrantLock();
     public static boolean hasRender = true;
     public static Thread thread;
-    public static Timer timer = new Timer(20.0F, 0L);
+    public static EarlyTimer timer = new EarlyTimer(20.0F, 0L);
     private static final Queue<Runnable> tasks = new ConcurrentLinkedDeque<>();
     public static Executor executor = tasks::add;
     
@@ -120,9 +123,9 @@ public class EarlyWindow {
         GLFW.glfwDefaultWindowHints();
         GLFW.glfwWindowHint(GLFW.GLFW_CLIENT_API, GLFW.GLFW_OPENGL_API);
         GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_CREATION_API, GLFW.GLFW_NATIVE_CONTEXT_API);
-        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 2);
-        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 0);
-        GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_ANY_PROFILE);
+        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 3);
+        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 2);
+        GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE);
         GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GLFW.GLFW_FALSE);
         initDimensions(defaultFullscreen, args);
         if (fullscreen) {
@@ -145,11 +148,11 @@ public class EarlyWindow {
                 int[] monitorXA = new int[1];
                 int[] monitorYA = new int[1];
                 GLFW.glfwGetMonitorPos(monitor, monitorXA, monitorYA);
-                GLFWVidMode videomode = GLFW.glfwGetVideoMode(monitor);
+                GLFWVidMode vidMode = GLFW.glfwGetVideoMode(monitor);
                 int monitorX = monitorXA[0];
                 int monitorY = monitorYA[0];
-                x = monitorX + videomode.width() / 2 - width / 2;
-                y = monitorY + videomode.height() / 2 - height / 2;
+                x = monitorX + vidMode.width() / 2 - width / 2;
+                y = monitorY + vidMode.height() / 2 - height / 2;
             }
         }
         
@@ -172,6 +175,7 @@ public class EarlyWindow {
             GLFW.glfwMakeContextCurrent(window);
             GL.createCapabilities();
             GL11.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+            
             while (running) {
                 try {
                     Runnable task;
@@ -181,15 +185,24 @@ public class EarlyWindow {
                     if (hasRender) {
                         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
                         GL11.glViewport(0, 0, width, height);
-                        GL11.glMatrixMode(GL11.GL_PROJECTION);
-                        GL11.glLoadIdentity();
-                        GL11.glOrtho(0.0F, (float) width / scale, 0.0F, (float) height / scale, 1000.0F, 3000.0F);
-                        GL11.glMatrixMode(GL11.GL_MODELVIEW);
-                        GL11.glLoadIdentity();
-                        GL11.glPushMatrix();
-                        GL11.glTranslated(0, 0, -2000F);
+                        EarlyRenderingStates.projectionMatrix.setIdentity();
+                        EarlyRenderingStates.projectionMatrix = Matrix4f.orthographic(0.0F, (float) width / scale, 0.0F, (float) height / scale, 1000.0F, 3000.0F);
+                        EarlyRenderingStates.modelViewMatrix.setIdentity();
+                        EarlyRenderingStates.modelViewMatrix.translate(0.0f, 0.0f, -2000.0f);
+                        
+                        EarlyBufferBuilder builder = new EarlyBufferBuilder("position_color", EarlyRenderFormat.POSITION_COLOR);
+                        builder.pos(-50 + width / scale / 2, -50 + height / scale / 2, 0.0f).color(1.0f, 0.0f, 0.0f, 1.0f).endVertex();
+                        builder.pos(50 + width / scale / 2, -50 + height / scale / 2, 0.0f).color(0.0f, 1.0f, 0.0f, 1.0f).endVertex();
+                        builder.pos(0.0f + width / scale / 2, 50 + height / scale / 2, 0.0f).color(0.0f, 0.0f, 1.0f, 1.0f).endVertex();
+                        builder.end(EarlyDrawType.TRIANGLE);
+                        builder = new EarlyBufferBuilder("position_color", EarlyRenderFormat.POSITION_COLOR);
+                        builder.pos(0, (float) height / scale, 0.0f).color(1.0f, 0.0f, 0.0f, 1.0f).endVertex();
+                        builder.pos((float) width / scale, (float) height / scale, 0.0f).color(0.0f, 1.0f, 0.0f, 1.0f).endVertex();
+                        builder.pos((float) width / scale, 0, 0.0f).color(0.0f, 0.0f, 1.0f, 1.0f).endVertex();
+                        builder.pos(0, 0, 0.0f).color(0.0f, 0.0f, 1.0f, 1.0f).endVertex();
+                        builder.end(EarlyDrawType.QUAD);
                         render(renderer);
-                        GL11.glPopMatrix();
+                        
                         GLFW.glfwSwapBuffers(window);
                         GLFW.glfwPollEvents();
                     }
@@ -217,27 +230,6 @@ public class EarlyWindow {
         BetterLoadingScreenClient.renderOverlay(graphics, 0, 0, timer.tickDelta, 1.0F);
         for (EarlyWindowHook hook : BetterLoadingScreenClient.hooks) {
             hook.render(graphics, timer.tickDelta);
-        }
-    }
-    
-    public static class Timer {
-        public float partialTick;
-        public float tickDelta;
-        private long lastMs;
-        private final float msPerTick;
-        
-        public Timer(float f, long l) {
-            this.msPerTick = 1000.0F / f;
-            this.lastMs = l;
-        }
-        
-        public int advanceTime(long l) {
-            this.tickDelta = (float) (l - this.lastMs) / this.msPerTick;
-            this.lastMs = l;
-            this.partialTick += this.tickDelta;
-            int i = (int) this.partialTick;
-            this.partialTick -= (float) i;
-            return i;
         }
     }
     

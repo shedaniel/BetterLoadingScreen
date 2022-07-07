@@ -58,7 +58,7 @@ public class MixinModelBakery {
     }
     
     // Blocks
-    @Inject(method = "method_4723", at = @At("RETURN"))
+    @Inject(method = {"method_4723", "lambda$processLoading$7"}, at = @At("RETURN"))
     private void builtinBlockLoaded(ResourceLocation resourceLocation, StateDefinition stateDefinition, CallbackInfo ci) {
         this.blockTask.next();
     }
@@ -143,7 +143,7 @@ public class MixinModelBakery {
         this.bakingTask.reset(topLevelModels.size());
     }
     
-    @Inject(method = "method_4733", at = @At(value = "INVOKE", shift = At.Shift.AFTER,
+    @Inject(method = {"method_4733", "lambda$uploadTextures$12"}, at = @At(value = "INVOKE", shift = At.Shift.AFTER,
                                              target = "Lnet/minecraft/client/resources/model/ModelBakery;bake(Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/client/resources/model/ModelState;)Lnet/minecraft/client/resources/model/BakedModel;"))
     private void bakedModel(ResourceLocation resourceLocation, CallbackInfo ci) {
         this.bakingTask.next();
