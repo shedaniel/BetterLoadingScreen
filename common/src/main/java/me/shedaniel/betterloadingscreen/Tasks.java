@@ -2,9 +2,12 @@ package me.shedaniel.betterloadingscreen;
 
 import dev.quantumfusion.taski.builtin.StepTask;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 public class Tasks {
     public static int LAUNCH_COUNT(boolean forge) {
-        return !forge ? 4 : 7;
+        return !forge ? 5 : 11;
     }
     
     // Forge: Scanning Mods
@@ -12,15 +15,18 @@ public class Tasks {
     // Loading Mods
     // - Common
     // - Client
-    // Forge: Registry
-    // Forge: Finalize Registry
+    // Forge: Registering Content
+    // Forge: Common Setup
     // Loading Assets
     // * Blocks
     // * Items
     // * Textures
-    // Compiling Assets
-    // - Stitching
-    // - Baking
+    // Forge: Sided Setup
+    // Forge: Finalize Registry
+    // Stitching
+    // Baking
+    // Forge: Finalize Models
+    public static final Lock LOCK = new ReentrantLock();
     public static StepTask MAIN = new StepTask("Loading Game");
     
 }

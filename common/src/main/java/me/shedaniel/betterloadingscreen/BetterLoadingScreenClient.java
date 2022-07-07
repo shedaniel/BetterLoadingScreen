@@ -22,7 +22,7 @@ public class BetterLoadingScreenClient {
         int scaledHeight = graphics.getScaledHeight();
         double d = Math.min(scaledWidth * 0.75D, scaledHeight) * 0.25D;
         int progressBarWidth = (int) (d * 4.0D);
-        int textColor = ((int) (alpha * 255) << 24) | (0xffffff & 0x00ffffff);
+        int textColor = ((int) (alpha * 255) << 24) | (0xffffff);
         
         // Render Memory Usage
         if (BetterLoadingScreen.CONFIG.rendersMemoryBar) {
@@ -56,7 +56,6 @@ public class BetterLoadingScreenClient {
         if (alpha > 0.02F) {
             graphics.drawString(task.getName(), x, y - 10, textColor);
         }
-        
         
         _renderProgressBar(graphics, x, width, y, task.getProgress(), alpha, renderer);
         if (task instanceof StepTask stepTask) {

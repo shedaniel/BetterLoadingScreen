@@ -38,8 +38,8 @@ public class MixinGameData {
             field.setAccessible(true);
             BiMap<ResourceLocation, ForgeRegistry<? extends IForgeRegistryEntry<?>>> frozenRegistries = (BiMap<ResourceLocation, ForgeRegistry<? extends IForgeRegistryEntry<?>>>) field.get(RegistryManager.FROZEN);
             BiMap<ResourceLocation, ForgeRegistry<? extends IForgeRegistryEntry<?>>> registries = (BiMap<ResourceLocation, ForgeRegistry<? extends IForgeRegistryEntry<?>>>) field.get(RegistryManager.ACTIVE);
-            syncTask = new StepTask("Syncing Registries", registries.size());
-            freezeTask = new StepTask("Freezing Registries", registries.size());
+            syncTask = new StepTask("Syncing Data", registries.size());
+            freezeTask = new StepTask("Freezing Data", registries.size());
             Tasks.MAIN.setSubTask(new StageTask("Finalizing Registries", syncTask, freezeTask));
         } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();

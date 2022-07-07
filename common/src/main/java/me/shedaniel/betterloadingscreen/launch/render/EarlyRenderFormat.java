@@ -41,6 +41,12 @@ public class EarlyRenderFormat {
         }
     }
     
+    public void cleanAttrs() {
+        for (int i = 0; i < parts.size(); i++) {
+            GL20.glDisableVertexAttribArray(i);
+        }
+    }
+    
     private record Part(PartType type, int count) {}
     
     public enum PartType {

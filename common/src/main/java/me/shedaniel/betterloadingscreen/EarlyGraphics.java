@@ -48,7 +48,7 @@ public enum EarlyGraphics implements GraphicsBackend {
             x2 = tmp;
         }
         
-        if (y1 < y2) {
+        if (y1 > y2) {
             tmp = y1;
             y1 = y2;
             y2 = tmp;
@@ -103,12 +103,12 @@ public enum EarlyGraphics implements GraphicsBackend {
     
     @Override
     public int getScaledWidth() {
-        return (int) Math.ceil(EarlyWindow.framebufferWidth / (double) EarlyWindow.scale);
+        return (int) Math.ceil(EarlyWindow.framebufferWidth / EarlyWindow.scale);
     }
     
     @Override
     public int getScaledHeight() {
-        return (int) Math.ceil(EarlyWindow.framebufferHeight / (double) EarlyWindow.scale);
+        return (int) Math.ceil(EarlyWindow.framebufferHeight / EarlyWindow.scale);
     }
     
     @Override

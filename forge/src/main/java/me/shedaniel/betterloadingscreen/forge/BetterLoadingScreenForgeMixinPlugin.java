@@ -34,7 +34,10 @@ public class BetterLoadingScreenForgeMixinPlugin implements IMixinConfigPlugin {
     public static final Logger LOGGER = LogManager.getLogger(BetterLoadingScreenForgeMixinPlugin.class);
     
     static {
-        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> Client::run);
+        if (System.getProperty("betterloadingscreen.loaded", "false").equals("false")) {
+            System.setProperty("betterloadingscreen.loaded", "true");
+            DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> Client::run);
+        }
     }
     
     public static class Client {
@@ -106,7 +109,7 @@ public class BetterLoadingScreenForgeMixinPlugin implements IMixinConfigPlugin {
             BetterLoadingScreenClient.renderer = renderer;
             
             if (BetterLoadingScreen.isEarlyLoadingEnabled()) {
-                EarlyWindow.start(BetterLoadingScreenForgeVisualization.extractRunArgs(), EarlyWindow.getDefaultFullscreen(FMLPaths.GAMEDIR.get()), FMLLoader.versionInfo().mcVersion(), renderer);
+                EarlyWindow.start(BetterLoadingScreenForgeVisualization.extractRunArgs(), FMLPaths.GAMEDIR.get(), FMLLoader.versionInfo().mcVersion(), renderer, false);
             }
             // StartupMessageManager
             Set<String> messages = new HashSet<>();

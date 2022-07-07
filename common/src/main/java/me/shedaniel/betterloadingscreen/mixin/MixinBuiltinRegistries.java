@@ -26,7 +26,7 @@ public class MixinBuiltinRegistries {
         Tasks.MAIN.setSubTask(TASK);
     }
     
-    @Inject(method = "method_30566", at = @At("TAIL"))
+    @Inject(method = {"method_30566", "lambda$static$2", "m_206392_"}, at = @At("TAIL"))
     private static void endLoad(ResourceLocation resourceLocation, Supplier supplier, CallbackInfo ci) {
         TASK.next();
     }

@@ -44,9 +44,9 @@ public class BakedGlyph {
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         EarlyBufferBuilder builder = new EarlyBufferBuilder("position_color_tex", EarlyRenderFormat.POSITION_COLOR_TEX);
         builder.pos(x1 + xo1, y2, 0.0F).color(r, g, b, a).tex(u0, v1).endVertex();
-        builder.pos(x1 + xo2, y1, 0.0F).color(r, g, b, a).tex(u0, v0).endVertex();
-        builder.pos(x2 + xo2, y1, 0.0F).color(r, g, b, a).tex(u1, v0).endVertex();
         builder.pos(x2 + xo1, y2, 0.0F).color(r, g, b, a).tex(u1, v1).endVertex();
+        builder.pos(x2 + xo2, y1, 0.0F).color(r, g, b, a).tex(u1, v0).endVertex();
+        builder.pos(x1 + xo2, y1, 0.0F).color(r, g, b, a).tex(u0, v0).endVertex();
         builder.end(EarlyDrawType.QUAD);
     }
 }

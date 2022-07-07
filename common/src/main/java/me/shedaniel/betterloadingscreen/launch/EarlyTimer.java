@@ -4,7 +4,7 @@ public class EarlyTimer {
     public float partialTick;
     public float tickDelta;
     private long lastMs;
-    private final float msPerTick;
+    public final float msPerTick;
     
     public EarlyTimer(float f, long l) {
         this.msPerTick = 1000.0F / f;

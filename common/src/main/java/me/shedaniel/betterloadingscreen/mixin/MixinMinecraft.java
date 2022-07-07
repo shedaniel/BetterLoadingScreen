@@ -2,6 +2,7 @@ package me.shedaniel.betterloadingscreen.mixin;
 
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferUploader;
 import me.shedaniel.betterloadingscreen.BetterLoadingScreen;
 import me.shedaniel.betterloadingscreen.impl.mixinstub.MinecraftStub;
 import me.shedaniel.betterloadingscreen.launch.EarlyWindow;
@@ -20,6 +21,7 @@ public class MixinMinecraft implements MinecraftStub {
         if (!BetterLoadingScreen.isFurtherLoadingEnabled()) return;
         Runnable task = () -> {
             RenderSystem.assertOnRenderThread();
+            BufferUploader.reset();
             EarlyWindow.LOGGER.info("Moving render out");
             EarlyWindow.lock.lock();
             EarlyWindow.LOGGER.info("Acquired lock for render out");
@@ -35,8 +37,7 @@ public class MixinMinecraft implements MinecraftStub {
                 EarlyWindow.framebufferWidth = window.framebufferWidth;
                 EarlyWindow.framebufferHeight = window.framebufferHeight;
                 EarlyWindow.fullscreen = window.fullscreen;
-                EarlyWindow.scale = EarlyWindow.calculateScale(false);
-                EarlyWindow.setRender(true, true);
+                EarlyWindow.setRender(window.getGuiScale(), true, true);
             } finally {
                 EarlyWindow.lock.unlock();
             }
@@ -59,10 +60,10 @@ public class MixinMinecraft implements MinecraftStub {
             EarlyWindow.LOGGER.info("Acquired lock for render in");
             
             try {
-                EarlyWindow.setRender(false, true);
+                Window window = Minecraft.getInstance().getWindow();
+                EarlyWindow.setRender(window.getGuiScale(), false, true);
                 GLFW.glfwMakeContextCurrent(EarlyWindow.window);
                 GL.createCapabilities();
-                Window window = Minecraft.getInstance().getWindow();
                 int[] ax = new int[1];
                 int[] ay = new int[1];
                 GLFW.glfwGetWindowPos(window.getWindow(), ax, ay);

@@ -50,7 +50,7 @@ public abstract class MixinWindow {
     ))
     private long createWindow(@Coerce Object visualization, IntSupplier width, IntSupplier height, Supplier<String> title, LongSupplier monitor) {
         if (BetterLoadingScreen.isEarlyLoadingEnabled()) {
-            EarlyWindow.setRender(false, true);
+            EarlyWindow.setRender(null, false, true);
             
             return EarlyWindow.window;
         }

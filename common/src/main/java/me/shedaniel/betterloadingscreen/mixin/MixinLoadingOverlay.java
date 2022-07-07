@@ -2,14 +2,18 @@ package me.shedaniel.betterloadingscreen.mixin;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.*;
 import me.shedaniel.betterloadingscreen.BetterLoadingScreen;
 import me.shedaniel.betterloadingscreen.BetterLoadingScreenClient;
 import me.shedaniel.betterloadingscreen.BetterLoadingScreenConfig;
 import me.shedaniel.betterloadingscreen.MinecraftGraphics;
+import me.shedaniel.betterloadingscreen.launch.render.EarlyBufferBuilder;
+import me.shedaniel.betterloadingscreen.launch.render.EarlyDrawType;
+import me.shedaniel.betterloadingscreen.launch.render.EarlyRenderFormat;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LoadingOverlay;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -40,13 +44,39 @@ public abstract class MixinLoadingOverlay {
     
     @Shadow @Final private Minecraft minecraft;
     
+    @Inject(method = "render", at = @At(value = "INVOKE",
+                                        target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShaderTexture(ILnet/minecraft/resources/ResourceLocation;)V",
+                                        ordinal = 0))
+    private void renderHead(PoseStack poseStack, int i, int j, float f, CallbackInfo ci) {
+        float g = this.fadeOutStart > -1L ? (float) (Util.getMillis() - this.fadeOutStart) / 1000.0F : -1.0F;
+        if (g < 1.0F && BetterLoadingScreen.CONFIG.rainbow) {
+            BufferBuilder builder = Tesselator.getInstance().getBuilder();
+            RenderSystem.enableBlend();
+            RenderSystem.disableTexture();
+            RenderSystem.defaultBlendFunc();
+            RenderSystem.setShader(GameRenderer::getPositionColorShader);
+            builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+            MinecraftGraphics graphics = MinecraftGraphics.INSTANCE;
+            float a = 1.0F - Mth.clamp(g, 0.0F, 1.0F);
+            builder.vertex(0, graphics.getScaledHeight(), 0.0f).color(1.0f, 0.0f, 0.0f, a).endVertex();
+            builder.vertex(graphics.getScaledWidth(), graphics.getScaledHeight(), 0.0f).color(171 / 255f, 74 / 255f, 14 / 255f, a).endVertex();
+            builder.vertex(graphics.getScaledWidth(), 0, 0.0f).color(0.0f, 0.0f, 1.0f, a).endVertex();
+            builder.vertex(0, 0, 0.0f).color(156 / 255f, 35 / 255f, 217 / 255f, a).endVertex();
+            builder.end();
+            BufferUploader.end(builder);
+            RenderSystem.enableTexture();
+            RenderSystem.disableBlend();
+        }
+    }
+    
     @Inject(method = "render", at = @At(
             value = "RETURN"
     ))
     private void render(PoseStack poseStack, int i, int j, float f, CallbackInfo ci) {
         float g = this.fadeOutStart > -1L ? (float) (Util.getMillis() - this.fadeOutStart) / 1000.0F : -1.0F;
         if (g < 1.0F) {
-            BetterLoadingScreenClient.renderOverlay(MinecraftGraphics.INSTANCE, i, j, f, 1.0F - Mth.clamp(g, 0.0F, 1.0F));
+            MinecraftGraphics graphics = MinecraftGraphics.INSTANCE;
+            BetterLoadingScreenClient.renderOverlay(graphics, i, j, f, 1.0F - Mth.clamp(g, 0.0F, 1.0F));
         }
     }
     

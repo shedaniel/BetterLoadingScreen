@@ -108,6 +108,8 @@ public class EarlyBufferBuilder {
         this.format.setupAttrs();
         
         GL30.glDrawElements(drawType.getGlMode(), count / drawType.getVertexes() * drawType.getLength(), GL11.GL_UNSIGNED_BYTE, 0);
+    
+        this.format.cleanAttrs();
         
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);

@@ -46,7 +46,7 @@ public abstract class MixinWindowOptifine {
     ))
     private long createWindow(Object visualization, @Coerce Object method, Object[] args) {
         if (BetterLoadingScreen.isEarlyLoadingEnabled()) {
-            EarlyWindow.setRender(false, true);
+            EarlyWindow.setRender(null, false, true);
             
             return EarlyWindow.window;
         }
@@ -66,7 +66,7 @@ public abstract class MixinWindowOptifine {
     ))
     private long createWindow(int width, int height, CharSequence title, long monitor, long share) {
         if (BetterLoadingScreen.isEarlyLoadingEnabled()) {
-            EarlyWindow.setRender(false, true);
+            EarlyWindow.setRender(null, false, true);
             
             return EarlyWindow.window;
         }

@@ -45,7 +45,7 @@ public abstract class MixinWindow {
     ))
     private long createWindow(int width, int height, CharSequence title, long monitor, long share) {
         if (BetterLoadingScreen.isEarlyLoadingEnabled()) {
-            EarlyWindow.setRender(false, true);
+            EarlyWindow.setRender(null, false, true);
             
             return EarlyWindow.window;
         }

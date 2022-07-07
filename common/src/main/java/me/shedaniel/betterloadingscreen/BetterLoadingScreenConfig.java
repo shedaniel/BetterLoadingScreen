@@ -12,6 +12,8 @@ public class BetterLoadingScreenConfig {
     public boolean rendersLogo = true;
     @Comment("\nDeclares the background color of the loading screen.\nDefault: #EF323D")
     public String backgroundColor = "#EF323D";
+    @Comment("\nDeclares whether the background should be rainbow.\nDefault: true")
+    public boolean rainbow = true;
     @Comment("\nDeclares the bar color of the loading screen.\nDefault: #FFFFFF")
     public String barColor = "#FFFFFF";
     @Comment("\nDeclares the bar frame color of the loading screen.\nDefault: #FFFFFF")

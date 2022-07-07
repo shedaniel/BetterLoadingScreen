@@ -54,6 +54,8 @@ processResources {
 
 shadowJar {
     relocate "blue.endless.jankson", "me.shedaniel.betterloadingscreen.shadowed.blue.endless.jankson"
+    relocate "dev.quantumfusion.taski", "me.shedaniel.betterloadingscreen.shadowed.dev.quantumfusion.taski"
+    exclude "org/**"
     exclude "fabric.mod.json"
     exclude "architectury.common.json"
 

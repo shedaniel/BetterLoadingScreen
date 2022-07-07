@@ -39,7 +39,7 @@ public class Image implements Closeable {
     }
     
     public Image(int width, int height, int channels) {
-        this(width, height, channels, MemoryUtil.nmemAlloc(width * height * channels));
+        this(width, height, channels, MemoryUtil.nmemAlloc((long) width * height * channels));
     }
     
     public Image(int width, int height, int channels, long pixels) {
@@ -52,7 +52,7 @@ public class Image implements Closeable {
     @Override
     public void close() {
         if (this.pixels != 0L) {
-            STBImage.nstbi_image_free(this.pixels);
+            MemoryUtil.nmemFree(this.pixels);
         }
         
         this.pixels = 0L;
@@ -192,7 +192,11 @@ public class Image implements Closeable {
             
             while (byteChannel.read(buffer) != -1) {
                 if (buffer.remaining() == 0) {
-                    buffer = MemoryUtil.memRealloc(buffer, buffer.capacity() * 2);
+                    ByteBuffer newBuffer = MemoryUtil.memRealloc(buffer, buffer.capacity() * 2);
+                    if (buffer != null && MemoryUtil.memAddress(newBuffer) != MemoryUtil.memAddress(buffer)) {
+                        MemoryUtil.memFree(buffer);
+                        buffer = newBuffer;
+                    }
                 }
             }
             

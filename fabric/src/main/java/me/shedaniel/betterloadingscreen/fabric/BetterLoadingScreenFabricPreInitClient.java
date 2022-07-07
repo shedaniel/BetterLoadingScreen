@@ -58,8 +58,8 @@ public class BetterLoadingScreenFabricPreInitClient {
         BetterLoadingScreenClient.renderer = renderer;
         
         if (BetterLoadingScreen.isEarlyLoadingEnabled()) {
-            EarlyWindow.start(FabricLoader.getInstance().getLaunchArguments(true), EarlyWindow.getDefaultFullscreen(FabricLoader.getInstance().getGameDir()), FabricLoader.getInstance().getModContainer("minecraft").get()
-                    .getMetadata().getVersion().getFriendlyString(), renderer);
+            EarlyWindow.start(FabricLoader.getInstance().getLaunchArguments(true), FabricLoader.getInstance().getGameDir(), FabricLoader.getInstance().getModContainer("minecraft").get()
+                    .getMetadata().getVersion().getFriendlyString(), renderer, true);
         }
     }
 }
