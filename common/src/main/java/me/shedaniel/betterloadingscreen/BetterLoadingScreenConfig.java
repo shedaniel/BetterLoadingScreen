@@ -8,6 +8,8 @@ public class BetterLoadingScreenConfig {
     public boolean rendersMemoryBar = true;
     @Comment("\nWhether the current hints on the top left should be drawn.\nDefault: true")
     public boolean rendersHint = true;
+    @Comment("\nWhether the game loading time on the top left be drawn.\nDefault: true")
+    public boolean rendersLoadingTime = true;
     @Comment("\nRenders the logo on the loading screen.\nDefault: true")
     public boolean rendersLogo = true;
     @Comment("\nDeclares the background color of the loading screen.\nDefault: #EF323D")

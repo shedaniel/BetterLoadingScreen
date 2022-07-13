@@ -56,7 +56,7 @@ public class BetterLoadingScreenClient {
         }
 
         // Render game load used time
-        if (bootstrapTime != 0 && alpha > 0.2F) {
+        if (bootstrapTime != 0 && alpha > 0.2F && BetterLoadingScreen.CONFIG.rendersLoadingTime) {
             int loadingSec = Math.round((System.currentTimeMillis() - bootstrapTime) / 1000f);
             graphics.drawString("Loading Time: " + secToTimeString(loadingSec), 2, 12, textColor);
         }
